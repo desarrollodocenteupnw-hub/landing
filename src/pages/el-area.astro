@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ProcessCardsPremium from '../components/ProcessCardsPremium.astro';
+import PremiumPageHero from '../components/PremiumPageHero.astro';
+import {content,cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt,cmsGroup} from '../lib/content';
+const principles=cmsGroup('area.principles');
+const audiences=cmsGroup('area.audiences');
+const purposeTitle=cmsText('area.purpose.title','Acompañar al docente.\nEnriquecer la experiencia educativa.');
+---
+<Layout title={cmsText('seo.area.title','Nuestra Dirección')} active="area">
+  <PremiumPageHero
+    eyebrow={cmsText('area.hero.eyebrow','Dirección de Gestión y Desarrollo Docente')}
+    title={cmsText('area.hero.title','Impulsamos la docencia Wiener.')}
+    description={cmsText('area.hero.body','Conectamos cinco procesos para acompañar a nuestros docentes, fortalecer su práctica y contribuir a una experiencia educativa de excelencia.')}
+    image={cmsImage('area.hero.image','/assets/gala-dialogo.webp')}
+    imageAlt={cmsAlt('area.hero.image','Comunidad docente Wiener compartiendo experiencias')}
+    tone="teal"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Nuestra Dirección'}]}
+    primaryLabel={cmsTitle('area.hero.primary','Conoce nuestro propósito')}
+    primaryHref={cmsUrl('area.hero.primary','#proposito')}
+    secondaryLabel={cmsTitle('area.hero.secondary','Conoce al equipo')}
+    secondaryHref={cmsUrl('area.hero.secondary','#equipo')}
+  />
+
+  <section class="section section--white" id="proposito">
+    <div class="container split-section">
+      <div class="area-photo" data-reveal><img src={cmsImage('area.purpose.image','/assets/gala-comunidad.webp')} alt={cmsAlt('area.purpose.image','Encuentro de la comunidad docente Wiener')} width="1200" height="1600" loading="lazy"/></div>
+      <div data-reveal>
+        <span class="eyebrow">{cmsText('area.purpose.kicker','Nuestro propósito')}</span>
+        <h2 class="process-lead">{purposeTitle.split('\n').map((line,index)=><>{index>0&&<br/>}{line}</>)}</h2>
+        <p style="margin-top:20px">{cmsText('area.purpose.body','Desde la incorporación a Wiener hasta el reconocimiento de su contribución, articulamos oportunidades de desarrollo, orientación y evaluación para una práctica docente en continua evolución.')}</p>
+        <ul class="principle-list">{principles.map((item,index)=><li><span class="index">{String(index+1).padStart(2,'0')}</span><div><h3>{item.titulo}</h3><p>{item.texto}</p></div></li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-surface">
+    <div class="container">
+      <div class="premium-section-heading">
+        <div><span class="premium-kicker premium-kicker--dark">{cmsText('area.work.kicker','Nuestro trabajo')}</span><h2>{cmsText('area.work.title','Cinco procesos. Un propósito compartido.')}</h2></div>
+        <p>{cmsText('area.work.body','Cada proceso responde a un momento distinto de la experiencia docente y se conecta con los demás.')}</p>
+      </div>
+      <ProcessCardsPremium/>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('area.need.kicker','Explora según tu necesidad')}</span><h2>{cmsText('area.need.title','Información para tomar acción.')}</h2></div><p>{cmsText('area.need.body','El portal organiza la información para docentes, directores y autoridades académicas.')}</p></div>
+      <div class="step-grid">
+        {audiences.map(item=><article class="step-card" data-reveal><span class="step-number">{item.icono}</span><h3>{item.titulo}</h3><p>{item.texto}</p>{item.url&&cmsText(`${item.id}.cta`,'')&&<a class="text-link" href={item.url} style="margin-top:23px;justify-self:start">{cmsText(`${item.id}.cta`,'')} <Icon size={18}/></a>}</article>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section premium-surface" id="equipo">
+    <div class="container">
+      <div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('area.team.kicker','Personas que acompañan tu desarrollo')}</span><h2>{cmsText('area.team.title','Nuestro equipo.')}</h2></div><p>{cmsText('area.team.body','Dirección de Gestión y Desarrollo Docente de la Universidad Norbert Wiener.')}</p></div>
+      <div class="team-grid">{content.equipo.map(person=><article class="team-card" data-reveal><div class="team-monogram" aria-hidden="true">{person.nombre.split(' ').slice(0,2).map(n=>n[0]).join('')}</div><div><h3>{person.nombre}</h3><p>{person.cargo}</p></div></article>)}</div>
+      <p class="team-note">{cmsText('area.team.note','Encuentra al responsable de cada actividad en la agenda del área.')}</p>
+      <div class="editorial-banner"><div><h3>{cmsText('area.banner.title','El área, en una mirada.')}</h3><p>{cmsText('area.banner.body','Recorre los cinco procesos, sus metas y las próximas fechas en el modo presentación.')}</p></div>{cmsTitle('area.banner.cta','Inicia la presentación')&&<a class="button button--ink" href={cmsUrl('area.banner.cta','/presentar/')}><Icon name="play" size={17}/> {cmsTitle('area.banner.cta','Inicia la presentación')}</a>}</div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,15 @@
+{
+  "name": "wiener-desarrollo-docente",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/astro.mjs dev",
+    "build": "node --env-file-if-exists=.env.local scripts/sync-content.mjs && node scripts/astro.mjs build",
+    "build:local": "node scripts/astro.mjs build",
+    "preview": "node scripts/astro.mjs preview",
+    "validate:content": "node scripts/validate-content.mjs"
+  },
+  "engines": { "node": ">=24.0.0" },
+  "dependencies": { "astro": "7.4.2" }
+}

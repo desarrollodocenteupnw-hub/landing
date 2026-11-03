@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import {cmsText,cmsTitle,cmsUrl} from '../lib/content';
+---
+<Layout title={cmsText('404.kicker','Página no encontrada')}>
+  <section class="not-found-premium"><div class="container"><div class="not-found-card"><span class="eyebrow">{cmsText('404.kicker','Página no encontrada')}</span><h1>{cmsText('404.title','No encontramos esa ruta.')}</h1><p>{cmsText('404.body','Puedes volver al inicio o explorar los procesos de Desarrollo Docente.')}</p><div class="button-row"><a href={cmsUrl('404.cta','/')} class="premium-button premium-button--dark">{cmsTitle('404.cta','Volver al inicio')} <Icon size={18}/></a><a href="/procesos/" class="button button--outline">{cmsText('404.processes','Explorar procesos')}</a></div></div></div></section>
+</Layout>

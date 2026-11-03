@@ -1,0 +1,16 @@
+---
+import {content,formatDate,cmsText} from '../lib/content';
+const {process='', showHeading=true}=Astro.props;
+const rows=content.kpis.filter(k=>!process || k.eje===process);
+---
+<div class="kpi-grid">
+{rows.map((kpi)=><article class="kpi-card" data-reveal>
+  <div class="kpi-label"><span>{kpi.eje}</span><span>{kpi.periodo}</span></div>
+  <h3>{kpi.indicador}</h3>
+  <div class="kpi-numbers"><div><span class="micro">{cmsText('kpi.meta','Meta')}</span><strong>{kpi.meta}<small>{kpi.unidad}</small></strong></div><div><span class="micro">{cmsText('kpi.result','Resultado')}</span>{kpi.valor!=='' && kpi.valor!==null && kpi.valor!==undefined ? <strong>{kpi.valor}<small>{kpi.unidad}</small></strong> : <p class="pending-result">{cmsText('kpi.pending','Pendiente de publicación')}</p>}</div></div>
+  {'fecha_corte' in kpi && kpi.fecha_corte && <p class="kpi-cutoff">{cmsText('kpi.cutoff','Corte del resultado:')} {formatDate(String(kpi.fecha_corte))}</p>}
+  {'universo' in kpi && kpi.universo && <p class="kpi-cutoff">{cmsText('kpi.universe','Universo:')} {String(kpi.universo)}</p>}
+  {'fuente' in kpi && kpi.fuente && <p class="kpi-cutoff">{cmsText('kpi.source','Fuente:')} {String(kpi.fuente)}</p>}
+</article>)}
+</div>
+{rows.length===0&&<p class="resource-note">{cmsText('kpi.empty','Aún no hay indicadores publicados para este proceso.')}</p>}

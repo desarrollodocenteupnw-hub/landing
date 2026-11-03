@@ -1,0 +1,10 @@
+---
+const {index=0, class:className=''}=Astro.props;
+---
+<svg class={`process-mark ${className}`} viewBox="0 0 100 100" fill="none" aria-hidden="true">
+  {index===0 && <><path d="M15 60 50 25l35 35" stroke="currentColor" stroke-width="15"/><path d="M32 80 50 62l18 18" stroke="currentColor" stroke-width="15" opacity=".35"/></>}
+  {index===1 && <><path d="M15 74 50 39l35 35M15 46 50 11l35 35" stroke="currentColor" stroke-width="12"/><path d="M50 55v37" stroke="currentColor" stroke-width="12" opacity=".3"/></>}
+  {index===2 && <><path d="M46 19H18v63h28M54 19h28v63H54" stroke="currentColor" stroke-width="13"/><path d="M36 50h28" stroke="currentColor" stroke-width="10" opacity=".4"/></>}
+  {index===3 && <><path d="M16 16h27v27H16zM57 16h27v27H57zM16 57h27v27H16z" fill="currentColor"/><path d="m56 72 12 12 21-29" stroke="currentColor" stroke-width="10"/></>}
+  {index===4 && <><path d="m50 9 12 27 29 5-21 22 4 29-24-14-24 14 4-29L9 41l29-5L50 9Z" stroke="currentColor" stroke-width="10"/><path d="M50 34v31M35 50h30" stroke="currentColor" stroke-width="7" opacity=".35"/></>}
+</svg>

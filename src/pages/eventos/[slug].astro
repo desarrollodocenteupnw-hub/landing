@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import Gallery from '../../components/Gallery.astro';
+import {content,eventSlug,eventDateInfo,eventImage,isEventMemory,eventRelatedProcesses,formatDate,safeLink,slugify,cmsText} from '../../lib/content';
+export function getStaticPaths(){return content.eventos.map(event=>({params:{slug:eventSlug(event)},props:{event}}));}
+const {event}=Astro.props;
+const memory=isEventMemory(event);
+const image=eventImage(event);
+const date=eventDateInfo(event);
+const related=eventRelatedProcesses(event);
+---
+<Layout title={event.nombre} description={event.descripcion} active="agenda">
+  <section class="premium-page-shell premium-page-shell--gold"><div class="container">
+    <nav class="premium-page-breadcrumbs" aria-label={cmsText('event.breadcrumb.aria','Migas de pan')}><a href="/">{cmsText('event.breadcrumb.home','Inicio')}</a><span>›</span><a href="/agenda/#eventos">{cmsText('event.breadcrumb.events','Eventos')}</a><span>›</span><span>{event.edicion}</span></nav>
+    <div class:list={["premium-page-card",{"premium-page-card--no-image":!image}]}>
+      <div class="premium-page-copy">
+        <span class="premium-page-eyebrow">{event.eje} · {memory?cmsText('events.group.memory.title','Memoria del área'):event.estado}</span>
+        <h1>{event.nombre}</h1>
+        <p>{event.edicion}{event.tema&&` · ${event.tema}`}</p>
+        <div class="premium-page-actions"><a class="premium-button premium-button--dark" href="#detalle">{cmsText('event.hero.cta','Conoce el encuentro')} <Icon name="down" size={17}/></a><a class="premium-page-secondary" href="/agenda/#eventos">{cmsText('event.hero.back','Volver a eventos')} <Icon name="arrow" size={17}/></a></div>
+      </div>
+      {image&&<div class="premium-page-media"><img src={image} alt={event.imagen_alt||cmsText('events.image.alt','Encuentro de la comunidad docente Wiener')} width="1200" height="760" fetchpriority="high"/><span class="premium-page-shape" aria-hidden="true"></span></div>}
+    </div>
+  </div></section>
+  <section class="section section--white" id="detalle"><div class="container event-detail-grid">
+    <div class="event-content-copy" data-reveal>
+      <span class="eyebrow">{memory?cmsText('event.memory.kicker','Una experiencia compartida'):cmsText('event.about.kicker','Sobre el encuentro')}</span>
+      <p class="event-summary">{event.descripcion}</p>
+      {(event.cifra_1||event.cifra_2)&&<div class="event-evidence" aria-label="Datos documentados del encuentro">
+        {event.cifra_1&&<div><strong>{event.cifra_1}</strong><span>{event.cifra_1_texto}</span></div>}
+        {event.cifra_2&&<div><strong>{event.cifra_2}</strong><span>{event.cifra_2_texto}</span></div>}
+      </div>}
+      <div class="button-row">
+        {safeLink(event.url)&&<a class="button button--teal" href={event.url} target="_blank" rel="noopener noreferrer">{memory?cmsText('event.source.memory','Leer noticia institucional'):cmsText('event.source.current','Consultar convocatoria')} <Icon name="diagonal" size={18}/></a>}
+        <a class="button button--outline" href={`/procesos/${slugify(event.eje)}/`}>{cmsText('event.process.prefix','Explorar')} {event.eje.toLowerCase()} <Icon size={18}/></a>
+      </div>
+      {related.length>0&&<div class="event-process-links"><span>{cmsText('event.related','También se vincula con')}</span>{related.map(process=><a href={`/procesos/${slugify(process)}/`}>{process} <Icon name="diagonal" size={16}/></a>)}</div>}
+      {event.estado==='Programado'&&!safeLink(event.url)&&<div class="notice"><span class="notice-dot"></span><p>{cmsText('event.notice.link','El enlace de participación se incorporará cuando se publique la convocatoria.')}</p></div>}
+      {!event.inicio&&<div class="notice"><span class="notice-dot"></span><p>{memory?cmsText('event.notice.memory_date','La noticia documenta este encuentro realizado, pero no precisa su fecha exacta. Se muestra por separado la fecha de publicación.'):cmsText('event.notice.current_date','La fecha exacta de este encuentro está por confirmar.')}</p></div>}
+    </div>
+    <aside class="event-details" aria-label="Datos del encuentro"><dl>
+      <div><dt>{date.label}</dt><dd>{date.value}</dd></div>
+      {event.hora&&<div><dt>{cmsText('events.fact.time','Hora')}</dt><dd>{event.hora}</dd></div>}
+      {event.modalidad&&<div><dt>{cmsText('events.fact.modality','Modalidad')}</dt><dd>{event.modalidad}</dd></div>}
+      {event.lugar&&<div><dt>{cmsText('events.fact.place','Lugar')}</dt><dd>{event.lugar}</dd></div>}
+      <div><dt>{cmsText('event.fact.edition','Edición')}</dt><dd>{event.edicion}</dd></div>
+      <div><dt>{cmsText('event.fact.process','Proceso')}</dt><dd>{event.eje}</dd></div>
+      <div><dt>{cmsText('event.fact.status','Estado informado')}</dt><dd>{event.estado}</dd></div>
+      {event.fecha_publicacion&&date.label!==cmsText('date.publication','Publicación')&&<div><dt>{cmsText('event.fact.published','Noticia publicada')}</dt><dd>{formatDate(event.fecha_publicacion)}</dd></div>}
+    </dl></aside>
+  </div></section>
+  {event.id==='EV-01'&&<section class="section"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('event.gallery.kicker','Memoria del encuentro')}</span><h2>{cmsText('event.gallery.title','La comunidad\nen imágenes.').split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('event.gallery.body','Una selección del registro fotográfico del encuentro.')}</p></div><Gallery full/></div></section>}
+</Layout>
+
+<style>
+  .event-feature-image{padding-bottom:64px}
+  .event-feature-image figure{margin:0;max-width:1100px}
+  .event-feature-image img{width:100%;height:auto;border-radius:24px}
+  .event-feature-image figcaption{font-size:13px;color:var(--muted);margin-top:14px}
+  .event-summary{margin-top:20px}
+  .event-details{background:#daf7f7;border-radius:20px;align-self:start}
+  .event-details dt{font-size:12px;font-weight:600}
+  .event-details dd{font-size:17px}
+  .event-evidence{display:flex;gap:36px;flex-wrap:wrap;margin:32px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:25px 0}
+  .event-evidence>div{display:flex;flex-direction:column;gap:6px}
+  .event-evidence strong{font-family:var(--font-ui,'Hanken Grotesk',sans-serif);font-size:48px;line-height:1;font-weight:700;letter-spacing:-.04em}
+  .event-evidence span{font-size:14px;color:var(--muted)}
+  .event-process-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:25px;font-size:14px}
+  .event-process-links>span{color:var(--muted)}
+  .event-process-links a{display:inline-flex;gap:8px;align-items:center;text-decoration:underline;text-underline-offset:5px}
+  @media(max-width:700px){.event-feature-image{padding-bottom:36px}.event-feature-image img{border-radius:14px}.event-content-copy .event-summary{font-size:18px}.event-evidence{gap:24px}.event-process-links{gap:12px}}
+</style>

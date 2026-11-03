@@ -1,0 +1,14 @@
+---
+import Icon from './Icon.astro';
+import {content,config,eventSlug,todayLima,formatDate,cmsText} from '../lib/content';
+const events=content.eventos;
+const today=todayLima();
+const requested=events.find(event=>event.id===config.evento_destacado);
+const upcoming=events.filter(e=>e.inicio && e.fin>=today && !/cancelad/i.test(e.estado)).sort((a,b)=>a.inicio.localeCompare(b.inicio));
+const datedPast=events.filter(e=>e.inicio && e.fin<today).sort((a,b)=>b.inicio.localeCompare(a.inicio));
+const event=requested||upcoming[0]||datedPast[0]||events[0];
+const sameMonth=event?.inicio && event?.fin && event.inicio.slice(0,7)===event.fin.slice(0,7);
+const days=event?.inicio ? event.inicio===event.fin ? event.inicio.slice(8) : sameMonth ? `${event.inicio.slice(8)}—${event.fin.slice(8)}` : formatDate(event.inicio,{day:'numeric',month:'short'}) : '';
+const dateLabel=event?.inicio ? formatDate(event.inicio,{month:'short',year:'numeric'}).toUpperCase() : cmsText('featured.confirm','POR CONFIRMAR');
+---
+<div class="featured-event" data-reveal><span class="featured-event-mark" aria-hidden="true">↗</span>{event?<><div><span class="eyebrow">{event.estado} · {event.edicion}</span><div class="event-date">{days}<small>{dateLabel}</small></div><h3>{event.nombre}</h3><p>{event.descripcion}</p></div><a class="text-link" href={`/eventos/${eventSlug(event)}/`}>{cmsText('featured.cta','Conoce el encuentro')} <Icon name="diagonal" size={19}/></a></>:<><span class="eyebrow">{cmsText('featured.empty.kicker','Encuentros de la comunidad')}</span><h3>{cmsText('featured.empty.title','Próximas oportunidades para encontrarnos.')}</h3><p>{cmsText('featured.empty.body','Los nuevos encuentros aparecerán aquí cuando se publique su información.')}</p><a class="text-link" href="/agenda/#eventos">{cmsText('featured.empty.cta','Consultar los eventos')} <Icon name="diagonal" size={19}/></a></>}</div>

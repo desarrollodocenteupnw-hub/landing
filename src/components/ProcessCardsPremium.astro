@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import ProcessMark from './ProcessMark.astro';
+import {processes, processCopy, processIconIndex} from '../lib/content';
+---
+<div class="premium-process-grid">
+  {processes.map((process,index)=>{
+    const copy=processCopy[process.slug];
+    return <a class={`premium-process-card premium-process-card--${process.slug}`} href={`/procesos/${process.slug}/`}>
+      <span class="premium-process-glow" aria-hidden="true"></span>
+      <div class="premium-process-top">
+        <span class="premium-process-icon"><ProcessMark index={processIconIndex(process.slug)}/></span>
+        <span class="premium-process-number">0{index+1}</span>
+      </div>
+      <div class="premium-process-copy">
+        <h3>{process.eje}</h3>
+        <p>{copy.teaser}</p>
+      </div>
+      <span class="premium-process-action"><Icon name="diagonal" size={18}/></span>
+    </a>
+  })}
+</div>

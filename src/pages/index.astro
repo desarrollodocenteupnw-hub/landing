@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ProcessCardsPremium from '../components/ProcessCardsPremium.astro';
+import MideGraphic from '../components/MideGraphic.astro';
+import Gallery from '../components/Gallery.astro';
+import FeaturedEvent from '../components/FeaturedEvent.astro';
+import EventsGrid from '../components/EventsGrid.astro';
+import {upcomingActivities,reportedExecution} from '../lib/schedule';
+import {content, todayLima, eventSlug, cmsText, cmsTitle, cmsUrl, cmsImage, cmsAlt, cmsGroup} from '../lib/content';
+const today=todayLima();
+const upcoming=upcomingActivities(content.actividades,today,3);
+const recognition=content.eventos.find(event=>event.id==='EV-01');
+const resourceLinks=cmsGroup('home.resources.links');
+const heroPrimary={label:cmsTitle('home.hero.primary','Conoce nuestros procesos'),url:cmsUrl('home.hero.primary','#procesos')};
+const heroSecondary={label:cmsTitle('home.hero.secondary','Revisa la agenda'),url:cmsUrl('home.hero.secondary','/agenda/')};
+const midePrimary={label:cmsTitle('home.mide.primary','Conoce MIDE'),url:cmsUrl('home.mide.primary','/procesos/evaluacion/')};
+const mideSecondary={label:cmsTitle('home.mide.secondary','Metas y resultados'),url:cmsUrl('home.mide.secondary','/resultados/')};
+const communityCta={label:cmsTitle('home.community.cta','Explora los encuentros'),url:cmsUrl('home.community.cta','/agenda/#eventos')};
+const agendaCta={label:cmsTitle('home.agenda.cta','Ver agenda completa'),url:cmsUrl('home.agenda.cta','/agenda/')};
+---
+<Layout home active="home" title={cmsText('seo.home.title','Desarrollo Docente')} description={cmsText('seo.home.description','Impulsamos el talento docente Wiener. Conoce nuestros cinco procesos, recursos y experiencias para seguir creciendo.')}>
+  <section class="premium-home-hero">
+    <div class="premium-home-photo" aria-hidden="true"><img src={cmsImage('home.hero.image','/assets/gala-dialogo.webp')} alt=""/></div>
+    <div class="premium-home-overlay" aria-hidden="true"></div>
+    <div class="container premium-home-content">
+      <div class="premium-home-copy">
+        <span class="premium-kicker">{cmsText('home.hero.kicker','Dirección de Gestión y Desarrollo Docente')}</span>
+        <h1>{cmsText('home.hero.title','Impulsamos una docencia de excelencia')} <span>{cmsText('home.hero.emphasis','para transformar vidas.')}</span></h1>
+        <p>{cmsText('home.hero.body','Acompañamos tu experiencia docente con orientación, formación, retroalimentación, evaluación y reconocimiento.')}</p>
+        <div class="premium-home-actions">
+          {heroPrimary.label&&heroPrimary.url&&<a class="premium-button premium-button--light" href={heroPrimary.url}>{heroPrimary.label} <Icon name="diagonal" size={18}/></a>}
+          {heroSecondary.label&&heroSecondary.url&&<a class="premium-home-link" href={heroSecondary.url}>{heroSecondary.label} <Icon name="calendar" size={17}/></a>}
+        </div>
+      </div>
+      <div class="premium-norby-wrap">
+        <div class="premium-norby-bubble"><strong>{cmsText('home.norby.title','Hola, soy Norby.')}</strong><span>{cmsText('home.norby.body','Tu aliado en el desarrollo docente. ¿Por dónde empezamos hoy?')}</span></div>
+        <img class="premium-norby" src={cmsImage('home.norby.image','/assets/norby-welcome.png')} alt={cmsAlt('home.norby.image','Norby, mascota institucional de la Universidad Norbert Wiener')}/>
+      </div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-section--soft" id="procesos">
+    <div class="container">
+      <div class="premium-section-heading">
+        <div><span class="premium-kicker premium-kicker--dark">{cmsText('home.processes.kicker','Nuestro recorrido')}</span><h2>{cmsText('home.processes.title','Cinco procesos para acompañarte en cada etapa de la docencia.')}</h2></div>
+        <p>{cmsText('home.processes.body','Explora el proceso que necesitas y encuentra información, recursos, fechas y oportunidades para tu desarrollo.')}</p>
+      </div>
+      <ProcessCardsPremium/>
+    </div>
+  </section>
+
+  <section class="premium-section premium-resources-section">
+    <div class="container premium-resources-grid">
+      <div class="premium-resource-panel">
+        <span class="premium-kicker premium-kicker--dark">{cmsText('home.resources.kicker','Recursos para tu desarrollo')}</span>
+        <h2>{cmsText('home.resources.title','Todo lo que necesitas, más cerca.')}</h2>
+        <div class="premium-resource-links">
+          {resourceLinks.map(item=><a href={item.url}><span><Icon name={item.icono || 'document'} size={19}/></span><strong>{item.titulo}</strong></a>)}
+        </div>
+      </div>
+      <div class="premium-promo-card">
+        <img src={cmsImage('home.promo.image','/assets/eventos/conectados-excelencia-2026.webp')} alt={cmsAlt('home.promo.image','Docentes reconocidos en Conectados con la Excelencia')}/>
+        <div><span>{cmsText('home.promo.kicker','Comunidad Wiener')}</span><h3>{cmsText('home.promo.title','Construimos juntos una docencia de excelencia.')}</h3>{recognition&&cmsTitle('home.promo.cta','Conoce la experiencia')&&<a href={`/eventos/${eventSlug(recognition)}/`}>{cmsTitle('home.promo.cta','Conoce la experiencia')} <Icon name="diagonal" size={16}/></a>}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-evaluation-section">
+    <div class="container premium-evaluation-grid">
+      <div class="premium-evaluation-copy">
+        <span class="premium-kicker">{cmsText('home.mide.kicker','Evaluación que impulsa el desarrollo')}</span>
+        <h2>{cmsText('home.mide.title','Medición Integral de Excelencia Docente.')}</h2>
+        <p>{cmsText('home.mide.body','Una mirada integral para reconocer fortalezas, identificar oportunidades de mejora y orientar decisiones de desarrollo profesional.')}</p>
+        <div class="premium-evaluation-actions">{midePrimary.label&&midePrimary.url&&<a class="premium-button premium-button--dark" href={midePrimary.url}>{midePrimary.label} <Icon name="diagonal" size={18}/></a>}{mideSecondary.label&&mideSecondary.url&&<a href={mideSecondary.url}>{mideSecondary.label} <Icon name="diagonal" size={15}/></a>}</div>
+      </div>
+      <div class="premium-evaluation-visual"><MideGraphic/></div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-community-section">
+    <div class="container">
+      <div class="premium-section-heading premium-section-heading--light">
+        <div><span class="premium-kicker">{cmsText('home.community.kicker','Experiencias de nuestra comunidad')}</span><h2>{cmsText('home.community.title','Compartimos ideas. Reconocemos el talento.')}</h2></div>
+        {communityCta.label&&communityCta.url&&<a class="premium-home-link" href={communityCta.url}>{communityCta.label} <Icon name="diagonal" size={17}/></a>}
+      </div>
+      <EventsGrid kind="memoria" limit={3}/>
+    </div>
+  </section>
+
+  <section class="premium-section premium-agenda-section">
+    <div class="container">
+      <div class="premium-section-heading"><div><span class="premium-kicker premium-kicker--dark">{cmsText('home.agenda.kicker','Conecta con lo que viene')}</span><h2>{cmsText('home.agenda.title','Tu próximo paso empieza aquí.')}</h2></div>{agendaCta.label&&agendaCta.url&&<a class="premium-home-link premium-home-link--dark" href={agendaCta.url}>{agendaCta.label} <Icon size={17}/></a>}</div>
+      <div class="home-agenda"><div><div class="upcoming-list" data-upcoming-list>{upcoming.map(a=>{const active=a.inicio<=today;const when=active?a.fin:a.inicio;return <a class="upcoming-item" href={`/agenda/?actividad=${a.id}&periodo=${a.periodo}`}><span class="upcoming-date">{when.slice(8)}<small>{new Date(when+'T12:00:00Z').toLocaleDateString('es-PE',{month:'short',timeZone:'UTC'})}</small></span><div><span class="eyebrow">{a.eje}</span><h3>{a.titulo_claro||a.actividad}</h3><p>{active?'Cierre del plazo':'Inicio'} · {a.periodo}{reportedExecution(a)}</p></div><Icon name="diagonal" size={20}/></a>})}</div></div><FeaturedEvent/></div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-gallery-section"><div class="container"><div class="premium-section-heading"><div><span class="premium-kicker premium-kicker--dark">{cmsText('home.gallery.kicker','Somos comunidad Wiener')}</span><h2>{cmsText('home.gallery.title','El valor de encontrarnos y seguir creciendo.')}</h2></div></div><Gallery/></div></section>
+  <script type="application/json" id="upcoming-data" set:html={JSON.stringify(content.actividades).replace(/</g,'\\u003c')}/>
+</Layout>

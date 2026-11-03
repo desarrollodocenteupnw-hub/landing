@@ -1,0 +1,70 @@
+---
+import {content,eventSlug,eventDateInfo,eventOrderDate,eventMatchesProcess,eventImage,isEventMemory,cmsText} from '../lib/content';
+import Icon from './Icon.astro';
+interface Props { filter?:string; kind?:'all'|'memoria'|'agenda'; limit?:number; }
+const {filter='',kind='all',limit=0}=Astro.props;
+const selected=content.eventos.filter(event=>eventMatchesProcess(event,filter));
+const memories=selected.filter(isEventMemory).sort((a,b)=>eventOrderDate(b).localeCompare(eventOrderDate(a)));
+const planned=selected.filter(event=>!isEventMemory(event)).sort((a,b)=>(a.inicio||'9999').localeCompare(b.inicio||'9999'));
+const groups=kind==='all'
+  ? [{title:cmsText('events.group.agenda.title','En agenda'),description:cmsText('events.group.agenda.body','Próximos encuentros y convocatorias.'),events:planned},{title:cmsText('events.group.memory.title','Memoria del área'),description:cmsText('events.group.memory.body','Experiencias realizadas y fuentes institucionales.'),events:memories}]
+  : [{title:'',description:'',events:kind==='memoria'?memories:planned}];
+const visibleGroups=groups.map(group=>({...group,events:limit?group.events.slice(0,limit):group.events})).filter(group=>group.events.length);
+---
+<div class="event-collections">
+{visibleGroups.map(group=><section class="event-collection" aria-label={group.title||cmsText('events.group.aria','Encuentros del área')}>
+  {group.title&&<header class="event-collection-heading"><h3>{group.title}</h3><p>{group.description}</p></header>}
+  <div class="events-grid" style={`--event-columns:${group.events.length===2?2:3}`}>
+  {group.events.map(event=>{
+    const image=eventImage(event);
+    const date=eventDateInfo(event);
+    const memory=isEventMemory(event);
+    return <a class={`event-card event-card--${event.id}`} href={`/eventos/${eventSlug(event)}/`} data-reveal>
+      <div class="event-art">
+        {image ? <img src={image} alt={event.imagen_alt||cmsText('events.image.alt','Comunidad docente durante un encuentro de la Universidad Norbert Wiener')} loading="lazy" decoding="async" width="1200" height="800"/> : <><div class="event-art-lines" aria-hidden="true"></div><span class="event-art-word" aria-hidden="true">{event.tema?'Ideas que se comparten.':event.id==='EV-02'?'Ideas que conectan.':'Excelencia docente.'}</span></>}
+        <span class:list={['event-state',{'event-state--memory':memory}]}>{memory?cmsText('events.state.memory','Realizado'):event.estado}</span>
+      </div>
+      <div class="event-content">
+        <span class="eyebrow">{event.eje}{event.tema&&` · ${event.tema}`}</span>
+        {group.title ? <h4>{event.nombre}</h4> : <h3>{event.nombre}</h3>}
+        <p class="event-edition">{event.edicion}</p>
+        <dl class="event-card-facts">
+          <div><dt>{date.label}</dt><dd>{date.value}</dd></div>
+          {event.hora&&<div><dt>{cmsText('events.fact.time','Hora')}</dt><dd>{event.hora}</dd></div>}
+          {(event.modalidad||event.lugar)&&<div><dt>{event.modalidad?cmsText('events.fact.modality','Modalidad'):cmsText('events.fact.place','Lugar')}</dt><dd>{event.modalidad||event.lugar}</dd></div>}
+        </dl>
+        <span class="text-link">{memory?cmsText('events.cta.memory','Explorar la memoria'):cmsText('events.cta.current','Consultar el encuentro')} <Icon size={19}/></span>
+      </div>
+    </a>;
+  })}
+  </div>
+</section>)}
+</div>
+
+<style>
+  .event-collections{display:grid;gap:64px}
+  .event-collection-heading{display:flex;justify-content:space-between;gap:24px;align-items:baseline;border-top:1px solid var(--line);padding-top:24px;margin-bottom:26px}
+  .event-collection-heading h3{font-size:25px;letter-spacing:-.025em}
+  .event-collection-heading p{font-size:15px}
+  .events-grid{display:grid;grid-template-columns:repeat(var(--event-columns,3),minmax(0,1fr));gap:28px}
+  .event-card{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;min-width:0;transition:transform .4s var(--ease),box-shadow .4s}
+  .event-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px #1720210b}
+  .event-art{height:auto;aspect-ratio:20/11;overflow:hidden;position:relative}
+  .event-art img{width:100%;height:100%;object-fit:cover;object-position:center}
+  .event-card--EV-07 .event-art img{object-position:50% 100%}
+  .event-state{top:18px;left:18px;right:auto;bottom:auto;max-width:calc(100% - 36px);background:var(--gold);color:var(--ink);border-radius:30px;padding:7px 13px;font-size:12px;line-height:1.3}
+  .event-state--memory{background:white}
+  .event-art-word{font-family:var(--font-display,N27,sans-serif);font-size:clamp(30px,3vw,48px);line-height:1.06;letter-spacing:-.04em;padding:62px 28px 28px}
+  .event-content{padding:26px;display:flex;flex:1;flex-direction:column;align-items:stretch}
+  .event-content .eyebrow{font-size:11px;letter-spacing:.08em;color:var(--teal-deep)}
+  .event-content :is(h3,h4){font-family:var(--font-ui,'Hanken Grotesk',sans-serif);font-weight:700;font-size:26px;line-height:1.12;letter-spacing:-.025em;margin:14px 0 9px}
+  .event-content .event-edition{font-size:14px;line-height:1.4;margin:0;color:var(--muted)}
+  .event-card-facts{margin:22px 0 26px;display:grid;gap:10px;font-size:14px;line-height:1.45}
+  .event-card-facts>div{display:grid;grid-template-columns:84px minmax(0,1fr);gap:9px}
+  .event-card-facts dt{color:var(--muted)}
+  .event-card-facts dd{margin:0;color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+  .event-content .text-link{margin-top:auto;align-self:flex-start;font-size:14px}
+  @media(max-width:1100px){.events-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:700px){.events-grid{grid-template-columns:1fr;gap:24px}.event-collections{gap:42px}.event-collection-heading{display:block}.event-collection-heading p{margin-top:10px}.event-art{aspect-ratio:20/11}.event-content{padding:24px}.event-content :is(h3,h4){font-size:27px}.event-art-word{font-size:42px}}
+  @media(prefers-reduced-motion:reduce){.event-card{transition:none}.event-card:hover{transform:none}}
+</style>

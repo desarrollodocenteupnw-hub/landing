@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import KpiGrid from '../components/KpiGrid.astro';
+import PremiumPageHero from '../components/PremiumPageHero.astro';
+import {content,processes,cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt} from '../lib/content';
+const extraGroups=[...new Set(content.kpis.filter(k=>!processes.some(p=>p.eje===k.eje)).map(k=>k.eje))];
+const resultCount=content.kpis.filter(k=>k.valor!==''&&k.valor!==null&&k.valor!==undefined).length;
+---
+<Layout title={cmsText('seo.results.title','Metas y resultados')} active="resultados">
+  <PremiumPageHero
+    eyebrow={cmsText('results.hero.eyebrow','Seguimiento del área')}
+    title={cmsText('results.hero.title','Lo que buscamos. Lo que medimos.')}
+    description={cmsText('results.hero.body','Conoce las metas de cada proceso y consulta los resultados disponibles con su periodo de referencia.')}
+    image={cmsImage('results.hero.image','/assets/gala-comunidad.webp')}
+    imageAlt={cmsAlt('results.hero.image','Docentes de la comunidad Wiener')}
+    tone="blue"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Metas y resultados'}]}
+    primaryLabel={cmsTitle('results.hero.primary','Ver indicadores')}
+    primaryHref={cmsUrl('results.hero.primary','#indicadores')}
+    secondaryLabel={cmsTitle('results.hero.secondary','Conoce MIDE')}
+    secondaryHref={cmsUrl('results.hero.secondary','/procesos/evaluacion/')}
+  />
+  <section class="section premium-surface" id="indicadores"><div class="container">
+    <div class="results-intro-grid">
+      <article class="results-principle"><span>{cmsText('results.section.kicker','Lectura ejecutiva')}</span><h2>{cmsText('results.section.title','Metas y resultados no son lo mismo.')}</h2><p>{cmsText('results.section.body','Las metas expresan el nivel que buscamos alcanzar. Los resultados se muestran únicamente cuando cuentan con información publicada y periodo de referencia.')}</p></article>
+      <article class="results-note-card"><h3>{cmsText('results.note.title','Un indicador por proceso.')}</h3><p>{cmsText('results.note.body','Esta vista permite revisar los compromisos principales de Inducción, Formación, Acompañamiento, Evaluación y Reconocimiento sin mezclar sus propósitos.')}</p></article>
+    </div>
+    <div class="result-toolbar"><div class="filter-pills" role="group" aria-label="Filtrar indicadores por proceso"><button class="filter-pill" data-result-filter="Todos" aria-pressed="true">{cmsText('results.filter.all','Todos')}</button>{processes.map(p=><button class="filter-pill" data-result-filter={p.eje} aria-pressed="false">{p.eje}</button>)}{extraGroups.map(e=><button class="filter-pill" data-result-filter={e} aria-pressed="false">{e}</button>)}</div></div><span class="result-count" data-result-status aria-live="polite">{cmsText('results.filter.status','Visión de todos los procesos')}</span>
+    {resultCount===0&&<div class="notice"><span class="notice-dot"></span><p><strong>{cmsText('results.empty.title','Metas del Plan de Desarrollo Docente 2026.')}</strong> {cmsText('results.empty','Los resultados de estos indicadores todavía no tienen un valor informado en el contenido publicado. Se incorporarán con su fecha de corte y fuente cuando estén disponibles.')}</p></div>}
+    {processes.map(process=><section class="result-group" data-result-group={process.eje}><div class="result-group-heading"><h2>{process.eje}</h2><a href={`/procesos/${process.slug}/`} class="text-link">{cmsText('results.process.cta','Conoce el proceso')} <Icon name="diagonal" size={17}/></a></div><KpiGrid process={process.eje}/></section>)}
+    {extraGroups.map(group=><section class="result-group" data-result-group={group}><div class="result-group-heading"><h2>{group}</h2><span class="eyebrow">{cmsText('results.transversal','Indicador transversal')}</span></div><KpiGrid process={group}/></section>)}
+    <div class="editorial-banner"><div><h3>{cmsText('results.banner.title','Profundiza en la evaluación del desempeño.')}</h3><p>{cmsText('results.banner.body','Modelo MIDE, etapas de aplicación, responsables y fechas de comunicación de resultados.')}</p></div>{cmsTitle('results.banner.cta','Consulta Evaluación')&&<a class="button button--ink" href={cmsUrl('results.banner.cta','/procesos/evaluacion/')}>{cmsTitle('results.banner.cta','Consulta Evaluación')} <Icon name="diagonal" size={19}/></a>}</div>
+  </div></section>
+</Layout>

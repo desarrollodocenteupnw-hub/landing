@@ -1,0 +1,13 @@
+---
+import {processes,processCopy,processIconIndex,cmsText} from '../lib/content';
+import Icon from './Icon.astro';
+import ProcessMark from './ProcessMark.astro';
+const {current='', compact=false}=Astro.props;
+---
+<div class:list={['process-grid',{'process-grid--compact':compact}]}>
+{processes.map((process,index)=><a href={`/procesos/${process.slug}/`} class:list={['process-card',{'is-current':current===process.slug}]} data-reveal>
+  <span class="process-card-top"><span class="index">0{index+1}</span><Icon name="diagonal" size={20}/></span>
+  <ProcessMark index={processIconIndex(process.slug)}/>
+  <div class="process-card-content"><h3>{process.eje}</h3><p>{process.beneficio || processCopy[process.slug].benefit}</p><span class="process-card-link">{cmsText('process.cards.cta','Explorar proceso')} <Icon size={18}/></span></div>
+</a>)}
+</div>

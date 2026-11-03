@@ -1,0 +1,126 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ProcessMark from '../components/ProcessMark.astro';
+import PremiumPageHero from '../components/PremiumPageHero.astro';
+import {content,processes,processIconIndex,eventSlug,eventDateInfo,isEventMemory,cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt} from '../lib/content';
+
+const text=(value:unknown)=>typeof value==='string'||typeof value==='number'?String(value).trim():'';
+const externalUrl=(value:unknown):string|null=>{
+  const raw=text(value);
+  if(!/^https?:\/\//i.test(raw))return null;
+  try{const url=new URL(raw);return ['https:','http:'].includes(url.protocol)&&url.hostname&&!url.username&&!url.password?url.href:null;}catch{return null;}
+};
+const initiativeStates:Record<string,string>={implementado:'Implementado',piloto:'Piloto',en_desarrollo:'En desarrollo',propuesto:'Propuesto'};
+type Initiative=Record<string,unknown>;
+const initiatives=(content.iniciativas as Initiative[]).map((row,index)=>({
+  id:text(row.id),title:text(row.titulo),process:text(row.eje),period:text(row.periodo),
+  challenge:text(row.desafio),intervention:text(row.intervencion),application:text(row.aplicacion),
+  evidence:text(row.evidencia),learning:text(row.aprendizaje),
+  state:initiativeStates[text(row.estado)]||text(row.estado),
+  url:externalUrl(row.url),imageUrl:externalUrl(row.imagen_url),
+  order:text(row.orden)&&Number.isFinite(Number(row.orden))?Number(row.orden):index,
+})).sort((a,b)=>a.order-b.order);
+const memoryEvents=content.eventos.filter(event=>event.eje==='Formación'&&isEventMemory(event));
+const themeMap=new Map<string,typeof memoryEvents>();
+memoryEvents.forEach(event=>{const theme=text(event.tema)||'Experiencias compartidas';const rows=themeMap.get(theme)||[];rows.push(event);themeMap.set(theme,rows);});
+const thematicStories=[...themeMap.entries()].map(([theme,events])=>({theme,events:events.sort((a,b)=>(b.fecha_publicacion||b.inicio||'').localeCompare(a.fecha_publicacion||a.inicio||''))}));
+const sectionTitle=cmsText('innovation.section.title','Cinco procesos.\nDistintas formas de avanzar.');
+const initiativesTitle=cmsText('innovation.initiatives.title','Exploramos nuevas\nposibilidades.');
+const experiencesTitle=cmsText('innovation.experiences.title','Conocimiento\nque se comparte.');
+---
+
+<Layout title={cmsText('seo.innovation.title','Innovación y mejora docente')} active="innovacion">
+  <PremiumPageHero
+    eyebrow={cmsText('innovation.hero.eyebrow','Innovación y mejora continua')}
+    title={cmsText('innovation.hero.title','Innovación desde la práctica docente.')}
+    description={cmsText('innovation.hero.body','La innovación atraviesa nuestros cinco procesos: conecta experiencias, herramientas y evidencias para seguir mejorando la docencia.')}
+    image={cmsImage('innovation.hero.image','/assets/eventos/buenas-practicas-ia-2025.webp')}
+    imageAlt={cmsAlt('innovation.hero.image','Experiencia de formación e innovación docente Wiener')}
+    tone="violet"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Innovación'}]}
+    primaryLabel={cmsTitle('innovation.hero.primary','Explorar enfoques')}
+    primaryHref={cmsUrl('innovation.hero.primary','#enfoques')}
+    secondaryLabel={cmsTitle('innovation.hero.secondary','Ver experiencias')}
+    secondaryHref={cmsUrl('innovation.hero.secondary','#experiencias')}
+  />
+
+  <section class="section" id="enfoques">
+    <div class="container">
+      <div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('innovation.section.kicker','Una mirada transversal')}</span><h2>{sectionTitle.split('\n').map((line,index)=><>{index>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('innovation.section.body','Cada proceso aporta una forma de aprender, acompañar y dar sentido a la mejora.')}</p></div>
+      {processes.map((process,index)=>{
+        const title=cmsText(`innovation.${process.slug}.title`,process.eje);
+        const body=cmsText(`innovation.${process.slug}.body`,process.descripcion);
+        const focus=cmsText(`innovation.${process.slug}.focus`,process.beneficio);
+        const detail=cmsText(`innovation.${process.slug}.detail`,'');
+        const application=cmsText(`innovation.${process.slug}.application`,'');
+        return <article class="innovation-long" data-reveal>
+          <ProcessMark index={processIconIndex(process.slug)}/>
+          <div><span class="eyebrow">0{index+1} / {process.eje}</span><h3 class="innovation-process-title">{title}</h3><p>{body}</p><a class="text-link" href={`/procesos/${process.slug}/`}>{cmsText('innovation.process.cta','Conoce el proceso')} <Icon name="diagonal" size={18}/></a></div>
+          <div class="innovation-long-detail"><h4>{focus}</h4>{detail&&<p>{detail}</p>}{application&&<><span class="eyebrow" style="margin-bottom:12px">{cmsText('innovation.detail.explore','Para explorar')}</span><p>{application}</p></>}</div>
+        </article>;
+      })}
+    </div>
+  </section>
+
+  {initiatives.length>0&&<section class="section section--white" id="iniciativas">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <div><span class="eyebrow">{cmsText('innovation.initiatives.kicker','Iniciativas del área')}</span><h2>{initiativesTitle.split('\n').map((line,index)=><>{index>0&&<br/>}{line}</>)}</h2></div>
+        <p>{cmsText('innovation.initiatives.body','Conoce qué busca cada iniciativa, cómo se desarrolla y qué aprendizajes comparte.')}</p>
+      </div>
+      <div class="initiative-list">
+        {initiatives.map(initiative=><article class="initiative-story" id={`iniciativa-${initiative.id}`} data-reveal>
+          <header class="initiative-header">
+            <div><span class="eyebrow">{initiative.process}{initiative.period&&` · ${initiative.period}`}</span><h3>{initiative.title}</h3></div>
+            {initiative.state&&<p class="initiative-state"><span>{cmsText('innovation.state','Estado')}</span>{initiative.state}</p>}
+          </header>
+          {initiative.imageUrl&&<figure class="initiative-image"><img src={initiative.imageUrl} alt={`Imagen de la iniciativa: ${initiative.title}`} loading="lazy" decoding="async"/></figure>}
+          <div class="initiative-details">
+            {initiative.challenge&&<div><h4>{cmsText('innovation.challenge','El desafío')}</h4><p>{initiative.challenge}</p></div>}
+            {initiative.intervention&&<div><h4>{cmsText('innovation.intervention','Qué proponemos')}</h4><p>{initiative.intervention}</p></div>}
+            {initiative.application&&<div><h4>{cmsText('innovation.application','Dónde se aplica')}</h4><p>{initiative.application}</p></div>}
+            {initiative.evidence&&<div class="initiative-evidence"><h4>{cmsText('innovation.evidence','Evidencias disponibles')}</h4><p>{initiative.evidence}</p>{initiative.url&&<a class="text-link" href={initiative.url} target="_blank" rel="noopener noreferrer">{cmsText('innovation.source','Consulta la fuente')} <Icon name="diagonal" size={17}/></a>}</div>}
+            {initiative.learning&&<div><h4>{cmsText('innovation.learning','Qué aprendimos')}</h4><p>{initiative.learning}</p></div>}
+          </div>
+          {!initiative.evidence&&initiative.url&&<a class="text-link initiative-link" href={initiative.url} target="_blank" rel="noopener noreferrer">{cmsText('innovation.cta','Conocer la iniciativa')} <Icon name="diagonal" size={18}/></a>}
+        </article>)}
+      </div>
+    </div>
+  </section>}
+
+  {thematicStories.length>0&&<section class="section section--white" id="experiencias">
+    <div class="container">
+      <div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('innovation.experiences.kicker','Experiencias de Formación')}</span><h2>{experiencesTitle.split('\n').map((line,index)=><>{index>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('innovation.experiences.body','Jornadas y ciclos documentados por la universidad, reunidos por tema para explorar sus aportes a la práctica docente.')}</p></div>
+      <div class="innovation-story-grid">
+        {thematicStories.map(story=><article class="innovation-story" data-reveal>
+          <span class="eyebrow">{cmsText('innovation.story.kicker','Formación / Experiencias compartidas')}</span><h3>{story.theme}</h3><p>{cmsText('innovation.story.body','Experiencias documentadas en el portal y agrupadas según el tema informado en Google Sheets.')}</p>
+          <ul class="innovation-story-links">{story.events.map(event=>{const date=eventDateInfo(event);return <li><a class="innovation-story-link" href={`/eventos/${eventSlug(event)}/`}><div><strong>{event.nombre}</strong><span class="micro">{date.label}: {date.value}</span></div><Icon name="diagonal" size={19}/></a></li>})}</ul>
+        </article>)}
+      </div>
+      <div class="editorial-banner"><div><h3>{cmsText('innovation.banner.title','Sigue explorando la experiencia docente.')}</h3><p>{cmsText('innovation.banner.body','Consulta los próximos encuentros y las memorias de actividades del área.')}</p></div>{cmsTitle('innovation.banner.cta','Explora los encuentros')&&<a class="button button--ink" href={cmsUrl('innovation.banner.cta','/agenda/#eventos')}>{cmsTitle('innovation.banner.cta','Explora los encuentros')} <Icon name="diagonal" size={18}/></a>}</div>
+    </div>
+  </section>}
+</Layout>
+
+<style>
+  .initiative-story{padding:45px 0;border-top:1px solid var(--line)}
+  .initiative-story:last-child{padding-bottom:0}
+  .initiative-header{display:flex;align-items:flex-start;justify-content:space-between;gap:35px;margin-bottom:32px}
+  .initiative-header>div{max-width:850px}
+  .initiative-header .eyebrow{color:var(--teal-deep)}
+  .initiative-header h3{font-size:clamp(28px,3vw,43px);line-height:1.16;margin-top:15px}
+  .initiative-state{display:flex;flex-direction:column;gap:5px;flex:none;border-left:2px solid var(--teal);padding:5px 0 5px 15px;color:var(--ink);font-size:14px}
+  .initiative-state>span{color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .initiative-image{margin:0 0 35px;background:var(--paper);overflow:hidden}
+  .initiative-image img{width:100%;max-height:540px;aspect-ratio:16/7;object-fit:cover}
+  .initiative-details{display:grid;grid-template-columns:1fr 1fr;gap:32px 70px}
+  .initiative-details>div{min-width:0}
+  .initiative-details h4{font-size:17px;line-height:1.4;letter-spacing:-.015em;margin-bottom:12px}
+  .initiative-details p{font-size:15px;line-height:1.75;white-space:pre-line;overflow-wrap:anywhere}
+  .initiative-details .text-link{font-size:13px;margin-top:20px}
+  .initiative-evidence{border-left:2px solid var(--teal);padding-left:23px}
+  .initiative-link{margin-top:30px}
+  @media(max-width:1000px){.initiative-details{gap:28px 40px}.initiative-header{gap:25px}}
+  @media(max-width:700px){.initiative-story{padding:32px 0}.initiative-header{display:block;margin-bottom:27px}.initiative-header h3{font-size:30px}.initiative-state{margin-top:22px;display:inline-flex;font-size:13px}.initiative-details{grid-template-columns:1fr;gap:27px}.initiative-details p{font-size:15px}.initiative-image{margin-bottom:27px}.initiative-image img{aspect-ratio:4/3}.initiative-evidence{padding-left:19px}}
+</style>

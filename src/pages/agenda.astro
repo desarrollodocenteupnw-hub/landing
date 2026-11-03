@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Agenda from '../components/Agenda.astro';
+import EventsGrid from '../components/EventsGrid.astro';
+import PremiumPageHero from '../components/PremiumPageHero.astro';
+import {content,cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt,cmsGroup} from '../lib/content';
+const context=cmsGroup('agenda.context');
+---
+<Layout title={cmsText('seo.agenda.title','Agenda y eventos')} active="agenda">
+  <PremiumPageHero
+    eyebrow={cmsText('agenda.hero.eyebrow','Planificación del área')}
+    title={cmsText('agenda.hero.title','Una agenda. Todos los procesos.')}
+    description={cmsText('agenda.hero.body','Consulta las fechas, encuentra tus próximas acciones y explora el cronograma de Desarrollo Docente.')}
+    image={cmsImage('agenda.hero.image','/assets/gala-auditorio.webp')}
+    imageAlt={cmsAlt('agenda.hero.image','Actividad académica de la comunidad Wiener')}
+    tone="navy"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Agenda y eventos'}]}
+    primaryLabel={cmsTitle('agenda.hero.primary','Explorar el cronograma')}
+    primaryHref={cmsUrl('agenda.hero.primary','#cronograma')}
+    secondaryLabel={cmsTitle('agenda.hero.secondary','Ver encuentros')}
+    secondaryHref={cmsUrl('agenda.hero.secondary','#eventos')}
+    note={cmsText('agenda.hero.note','Las fechas se muestran por periodo académico. La ejecución se informa por separado cuando está disponible.')}
+  />
+  <section class="section agenda-premium-shell" id="cronograma">
+    <div class="container">
+      <div class="section-header"><div><span class="eyebrow">{cmsText('agenda.section.kicker','Cronograma operativo')}</span><h2>{cmsText('agenda.section.title','Organiza las próximas acciones.')}</h2></div><p>{cmsText('agenda.section.body','Filtra la agenda por proceso, periodo y modalidad sin perder la lectura global del ciclo.')}</p></div>
+      <div class="agenda-premium-context">{context.map(item=><div class="agenda-context-card"><span>{item.titulo}</span><strong>{item.texto}</strong></div>)}</div>
+      <div class="agenda-premium-frame"><Agenda data={content}/></div>
+    </div>
+  </section>
+  <section class="section section--white" id="eventos"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('agenda.events.kicker','Encuentros de la comunidad')}</span><h2>{cmsText('agenda.events.title','Ideas, experiencias y reconocimiento.')}</h2></div><p>{cmsText('agenda.events.body','Conoce los eventos programados y vuelve a los momentos que ya compartimos.')}</p></div><EventsGrid/></div></section>
+</Layout>

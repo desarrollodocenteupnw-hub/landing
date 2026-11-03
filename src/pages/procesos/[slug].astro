@@ -1,0 +1,132 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import ProcessMark from '../../components/ProcessMark.astro';
+import ProcessCardsPremium from '../../components/ProcessCardsPremium.astro';
+import KpiGrid from '../../components/KpiGrid.astro';
+import EventsGrid from '../../components/EventsGrid.astro';
+import Agenda from '../../components/Agenda.astro';
+import {content,processes,processCopy,dimensions,processIconIndex,cmsText,cmsGroup,cmsImage} from '../../lib/content';
+export function getStaticPaths(){return processes.map((process,index)=>({params:{slug:process.slug},props:{process,index}}));}
+const {process,index}=Astro.props;
+const copy=processCopy[process.slug];
+const text=(value:unknown)=>typeof value==='string'||typeof value==='number'?String(value).trim():'';
+const externalUrl=(value:unknown):string|null=>{
+  const raw=text(value);
+  if(!/^https?:\/\//i.test(raw))return null;
+  try{const url=new URL(raw);return ['https:','http:'].includes(url.protocol)&&url.hostname&&!url.username&&!url.password?url.href:null;}catch{return null;}
+};
+const benefit=text(process.beneficio)||copy.benefit;
+const audience=text(process.publico)||copy.audience;
+const participation=text(process.como_participar);
+const processUrl=externalUrl(process.url);
+type FormationModule=Record<string,unknown>;
+const modules=content.formacion as FormationModule[];
+const routeGroups=new Map<string,FormationModule[]>();
+modules.forEach(module=>{const key=text(module.ruta_id)||text(module.linea);const group=routeGroups.get(key)||[];group.push(module);routeGroups.set(key,group);});
+const routes=[...routeGroups.entries()].map(([id,rows])=>{
+  const field=(name:string)=>rows.map(row=>text(row[name])).find(Boolean)||'';
+  return {id,linea:field('linea'),nombre:field('nombre'),insignia:field('insignia'),description:field('descripcion_ruta'),availability:field('disponibilidad'),url:externalUrl(field('url')),outcome:field('resultado_aprendizaje'),audience:field('publico'),duration:field('duracion'),modality:field('modalidad'),modules:[...rows].sort((a,b)=>{const aOrder=text(a.orden)?Number(a.orden):Number.NaN;const bOrder=text(b.orden)?Number(b.orden):Number.NaN;return (Number.isFinite(aOrder)&&Number.isFinite(bOrder)?aOrder-bOrder:0)||text(a.modulo).localeCompare(text(b.modulo),'es',{numeric:true});}).map(module=>({...module,moduleUrl:externalUrl(module.modulo_url)}))};
+}).sort((a,b)=>a.linea.localeCompare(b.linea,'es',{numeric:true}));
+const uniformModuleCount=routes.length>0&&routes.every(route=>route.modules.length===routes[0].modules.length)?routes[0].modules.length:null;
+const hasFormationCalls=routes.some(route=>route.availability||route.url);
+const stages=cmsGroup('evaluation.stages').map(row=>({title:row.titulo,detail:row.texto,key:row.icono}));
+const accompanimentTypes=cmsGroup('accompaniment.types').map(row=>({title:row.titulo,description:row.texto}));
+const featureItems=cmsGroup(`process.${process.slug}.features`).map(row=>({icon:row.icono||'document',label:row.titulo}));
+const defaultImage=process.slug==='formacion'?'/assets/eventos/buenas-practicas-ia-2025.webp':process.slug==='reconocimiento'?'/assets/eventos/conectados-excelencia-2026.webp':process.slug==='acompanamiento'?'/assets/gala-dialogo.webp':process.slug==='evaluacion'?'/assets/gala-auditorio.webp':'/assets/campus.jpg';
+const processImage=cmsImage(`process.${process.slug}.image`,defaultImage);
+const journeyTitle=cmsText(process.slug==='evaluacion'?'process.journey.evaluation_title':'process.journey.title',process.slug==='evaluacion'?'Evaluación que orienta la mejora.':'Un recorrido con propósito.');
+const metricTitle=cmsText('process.metrics.title','Metas para\nseguir avanzando.');
+const evalStageTitle=cmsText('evaluation.stages.title','Una mirada clara\nde cada etapa.');
+const formationEventTitle=cmsText('formation.events.title','Aprendizajes\nque compartimos.');
+const evaluationEventTitle=cmsText('evaluation.events.title','La excelencia\nse hace visible.');
+---
+<Layout title={`${process.eje} · Desarrollo Docente`} description={process.descripcion} active="procesos">
+<section class={`premium-process-hero premium-process-hero--${process.slug}`}>
+  <div class="container">
+    <div class="breadcrumbs premium-breadcrumbs"><a href="/">{cmsText('process.breadcrumb.home','Inicio')}</a><span>›</span><a href="/procesos/">{cmsText('process.breadcrumb.processes','Procesos')}</a><span>›</span><span>{process.eje}</span></div>
+    <div class="premium-process-hero-card">
+      <div class="premium-process-hero-copy">
+        <div class="premium-process-titleline"><span class="premium-process-badge"><ProcessMark index={processIconIndex(process.slug)}/></span><div><span class="premium-process-overline">Proceso 0{index+1}</span><h1>{process.eje}</h1></div></div>
+        <h2>{copy.lead}</h2>
+        <p>{process.descripcion}</p>
+        <div class="premium-process-hero-actions"><a class="premium-button premium-button--dark" href="#detalle">{cmsText(process.slug==='evaluacion'?'process.hero.primary.evaluation':'process.hero.primary.default',process.slug==='evaluacion'?'Comprende el modelo':'Conoce el proceso')} <Icon name="down" size={18}/></a><a class="premium-process-secondary" href="#calendario">{cmsText('process.hero.secondary','Ver fechas y acciones')} <Icon name="calendar" size={17}/></a></div>
+      </div>
+      <div class="premium-process-hero-photo"><img src={processImage} alt=""/><span aria-hidden="true"></span></div>
+    </div>
+    <nav class="premium-process-nav" aria-label={`Secciones de ${process.eje}`}>
+      <a class="is-active" href="#detalle">{cmsText('process.label.overview','Visión general')}</a>
+      <a href="#recorrido">{cmsText('process.label.journey','Recorrido del proceso')}</a>
+      <a href="#calendario">{cmsText('process.label.schedule','Cronograma')}</a>
+      {process.slug==='formacion'&&<a href="#rutas">{cmsText('process.label.offer','Oferta formativa')}</a>}
+      {process.slug==='evaluacion'&&<a href="#modelo">{cmsText('process.label.mide','MIDE')}</a>}
+      {process.slug==='evaluacion'&&<a href="/resultados/">{cmsText('process.label.results','Resultados')}</a>}
+      <a href="/recursos/">{cmsText('process.label.resources','Recursos')}</a>
+    </nav>
+  </div>
+</section>
+
+{featureItems.length>0&&<section class={`process-feature-strip process-feature-strip--${process.slug}`} aria-label={`Qué encontrarás en ${process.eje}`}><div class="container">{featureItems.map(item=><div class="process-feature-item"><span class="process-feature-icon"><Icon name={item.icon} size={19}/></span><strong>{item.label}</strong></div>)}</div></section>}
+
+<section class="section section--white" id="detalle"><div class="container"><span class="eyebrow" style="margin-bottom:24px">{cmsText('process.label.value','Qué aporta este proceso')}</span><div class="intro-columns"><div data-reveal><h2 class="process-lead">{benefit}</h2><p>{process.descripcion}</p></div><div class="process-audience" data-reveal><span class="eyebrow">{cmsText('process.label.audience','A quién está dirigido')}</span><h3>{audience}</h3>{participation||processUrl?<div class="process-participation"><span class="eyebrow">{cmsText('process.label.participate','Cómo participar')}</span>{participation&&<p>{participation}</p>}{processUrl&&<a class="text-link" href={processUrl} target="_blank" rel="noopener noreferrer">{cmsText('process.label.consult','Consulta el proceso')} <Icon name="diagonal" size={18}/></a>}</div>:<p>{cmsText('process.label.fallback','Encuentra las actividades del periodo, sus fechas y responsables en la agenda de este proceso.')}</p>}</div></div></div></section>
+
+{process.slug==='evaluacion'&&<section class="section section--teal" id="modelo"><div class="container"><div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('mide.section.kicker','Medición Integral de Excelencia Docente')}</span><h2>{cmsText('mide.section.title','MIDE.\nCuatro dimensiones.').split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('mide.section.body','Una mirada integral para comprender el desempeño, identificar oportunidades de mejora y reconocer la contribución docente.')}</p></div><div class="dimension-grid">{dimensions.map(dim=><article class="dimension-card" data-reveal style={`--dimension-color:${dim.color||'#07C8CD'}`}><span class="index">{dim.number}</span><h3>{dim.name}</h3><p>{dim.description}</p></article>)}</div><div class="notice"><span class="notice-dot"></span><p>{cmsText('mide.section.notice','La evaluación reúne acciones semestrales y anuales. Consulta el periodo y las fechas de aplicación, procesamiento y comunicación de cada actividad.')}</p></div></div></section>}
+
+<section class="section" id="recorrido"><div class="container"><div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('process.journey.kicker','Cómo funciona')}</span><h2>{journeyTitle}</h2></div></div><div class="step-grid">{copy.steps.map((step,i)=><article class="step-card" data-reveal><span class="step-number">0{i+1}</span><h3>{step.title}</h3><p>{step.body}</p></article>)}</div></div></section>
+
+{process.slug==='acompanamiento'&&<section class="section section--white" id="tipos-de-acompanamiento"><div class="container">
+  <div class="section-header"><div><span class="eyebrow">{cmsText('accompaniment.types.kicker','Tipos de acompañamiento')}</span><h2>{cmsText('accompaniment.types.title','Distintas formas de\nacompañarte.').split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('accompaniment.types.body','Observación, orientación y retroalimentación para fortalecer distintos aspectos de tu práctica docente.')}</p></div>
+  <details class="process-details accompaniment-details"><summary><span>{cmsText('accompaniment.types.summary','Conoce los tipos de acompañamiento y su alcance')}</span><Icon name="plus" size={20}/></summary><div class="process-details-body">
+    <div class="accompaniment-grid">{accompanimentTypes.map((type,i)=><article class="accompaniment-type"><span class="index">0{i+1}</span><h3>{type.title}</h3><p>{type.description}</p></article>)}</div>
+    <div class="accompaniment-scope"><div><h3>{cmsText('accompaniment.scope.audience.title','¿A quién está dirigido?')}</h3><p>{cmsText('accompaniment.scope.audience.body','A docentes de pregrado, posgrado y segundas especialidades.')}</p></div><div><h3>{cmsText('accompaniment.scope.priority.title','¿Cómo se prioriza?')}</h3><p>{cmsText('accompaniment.scope.priority.body','Se consideran las oportunidades de mejora identificadas en la evaluación del desempeño y los requerimientos de cada programa académico.')}</p></div></div>
+    <p class="resource-note">{cmsText('accompaniment.scope.source','Fuente: Plan de Desarrollo Docente 2026.')}</p>
+  </div></details>
+</div></section>}
+
+{process.slug==='formacion'&&<section class="section section--white" id="rutas"><div class="container">
+  <div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('formation.offer.kicker','Oferta formativa 2026–2027')}</span><h2>{routes.length===1?`1 ${cmsText('formation.offer.count_singular','línea.')}`:`${routes.length} ${cmsText('formation.offer.count_plural','líneas.')}`}<br/>{cmsText('formation.offer.title_suffix','Distintas formas de crecer.')}</h2></div><p>{cmsText(hasFormationCalls?'formation.offer.body_calls':'formation.offer.body_default',hasFormationCalls?'Explora los módulos de cada línea y consulta las convocatorias disponibles.':'Explora los módulos de cada línea y encuentra un camino para seguir desarrollando tu práctica.')}</p></div>
+  <div class="route-list">{routes.map(route=><details class="route-card" id={`ruta-${route.linea}`}><summary><span class="route-number">{route.linea}</span><div><h3>{route.nombre}</h3>{route.insignia&&<p>{cmsText('formation.route.recognition','Reconocimiento de la línea')} · {route.insignia}</p>}</div><Icon name="plus" size={20}/></summary>
+    {(route.description||route.outcome||route.audience||route.duration||route.modality||route.availability||route.url)&&<div class="route-information">{route.description&&<p class="route-description">{route.description}</p>}{route.outcome&&<div class="route-outcome"><span class="eyebrow">{cmsText('formation.route.work','Qué trabajarás')}</span><p>{route.outcome}</p></div>}{(route.audience||route.duration||route.modality)&&<dl class="route-metadata">{route.audience&&<div><dt>{cmsText('formation.route.audience','Dirigido a')}</dt><dd>{route.audience}</dd></div>}{route.duration&&<div><dt>{cmsText('formation.route.duration','Duración')}</dt><dd>{route.duration}</dd></div>}{route.modality&&<div><dt>{cmsText('formation.route.modality','Modalidad')}</dt><dd>{route.modality}</dd></div>}</dl>}{(route.availability||route.url)&&<div class="route-availability">{route.availability&&<p><span class="eyebrow">{cmsText('formation.route.availability','Disponibilidad')}</span>{route.availability}</p>}{route.url&&<a class="text-link" href={route.url} target="_blank" rel="noopener noreferrer">{cmsText('formation.route.open','Abrir convocatoria')} <Icon name="diagonal" size={17}/></a>}</div>}</div>}
+    <ol class="route-modules">{route.modules.map(module=><li><span>{text(module.modulo)}</span><div class="route-module-copy"><h4>{text(module.nombre_modulo)}</h4>{text(module.descripcion_modulo)&&<p>{text(module.descripcion_modulo)}</p>}{module.moduleUrl&&<a class="text-link" href={module.moduleUrl} target="_blank" rel="noopener noreferrer">{cmsText('formation.module.open','Abrir módulo')} <Icon name="diagonal" size={15}/></a>}</div></li>)}</ol>
+  </details>)}</div>
+  <div class="formation-facts"><div><strong>{routes.length}</strong><span>{cmsText('formation.fact.lines','Líneas de formación')}</span></div><div><strong>{uniformModuleCount??modules.length}</strong><span>{cmsText(uniformModuleCount?'formation.fact.modules_per_line':'formation.fact.modules_catalog',uniformModuleCount?'Módulos por línea':'Módulos en el catálogo')}</span></div><div><strong>2</strong><span>{cmsText('formation.fact.minimum','Actividades mínimas por periodo')}</span></div></div>
+  <details class="process-details formation-conditions"><summary><span>{cmsText('formation.conditions.summary','¿Cómo se reconoce una línea completada?')}</span><Icon name="plus" size={20}/></summary><div class="process-details-body"><p>{cmsText('formation.conditions.body','Al completar satisfactoriamente los cuatro módulos de una línea, el reconocimiento puede otorgarse como insignia digital o certificado.')}</p><ol class="formation-criteria">{[1,2,3].map(i=><li>{cmsText(`formation.conditions.${i}`,'')}</li>)}</ol><p>{cmsText('formation.conditions.note','')}</p><p class="resource-note">{cmsText('formation.conditions.source','')}</p></div></details>
+  <div class="notice"><span class="notice-dot"></span><p>{cmsText(hasFormationCalls?'formation.notice.calls':'formation.notice.default',hasFormationCalls?'Consulta la disponibilidad de cada línea y sus enlaces de convocatoria. Encuentra las fechas de las actividades en la agenda.':'Las fechas de las actividades están en la agenda. Consulta la inscripción y disponibilidad en las convocatorias de cada actividad.')}</p></div>
+</div></section>}
+
+<section class="section section--white" id="metas"><div class="container"><div class="section-header" data-reveal><div><span class="eyebrow">{cmsText('process.metrics.kicker','Seguimiento del proceso')}</span><h2>{metricTitle.split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><a class="text-link" href="/resultados/">{cmsText('process.metrics.cta','Consulta todos los procesos')} <Icon size={18}/></a></div><KpiGrid process={process.eje}/><p class="resource-note">{cmsText('process.metrics.note','Las metas expresan lo que buscamos alcanzar. Los resultados se muestran cuando cuentan con información publicada.')}</p></div></section>
+
+{process.slug==='evaluacion'&&<section class="section section--teal"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('evaluation.stages.kicker','Fechas clave de Evaluación')}</span><h2>{evalStageTitle.split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('evaluation.stages.body','Consulta el cronograma por etapa, periodo y modalidad para organizar las próximas acciones.')}</p></div><div class="evaluation-stage-grid">{stages.map((stage,i)=><article class="evaluation-stage" data-reveal><span class="micro">Etapa 0{i+1}</span><h3>{stage.title}</h3><p>{stage.detail}</p></article>)}</div></div></section>}
+
+<section class="section" id="calendario"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('process.schedule.kicker','Fechas y actividades')}</span><h2>Agenda de {process.eje.toLowerCase()}.</h2></div><a class="text-link" href="/agenda/">{cmsText('process.schedule.cta','Consulta la agenda del área')} <Icon size={18}/></a></div><Agenda data={content} initialProcess={process.eje}/></div></section>
+
+{process.slug==='reconocimiento'&&<section class="section section--white"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('recognition.events.kicker','Experiencias y comunidad')}</span><h2>{cmsText('recognition.events.title','Encuentros para reconocer.')}</h2></div></div><EventsGrid filter="Reconocimiento"/></div></section>}
+{process.slug==='formacion'&&<section class="section section--white"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('formation.events.kicker','Experiencias documentadas')}</span><h2>{formationEventTitle.split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('formation.events.body','Explora las jornadas y ciclos de formación publicados por la universidad.')}</p></div><EventsGrid filter="Formación" kind="memoria"/></div></section>}
+{process.slug==='evaluacion'&&<section class="section section--white"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('evaluation.events.kicker','Evaluación y reconocimiento')}</span><h2>{evaluationEventTitle.split('\n').map((line,i)=><>{i>0&&<br/>}{line}</>)}</h2></div><p>{cmsText('evaluation.events.body','Encuentros de reconocimiento vinculados a los resultados de la evaluación docente.')}</p></div><EventsGrid filter="Evaluación" kind="memoria"/></div></section>}
+
+<section class="section section--white"><div class="container"><div class="section-header"><div><span class="eyebrow">{cmsText('process.cross.kicker','Un área conectada')}</span><h2>{cmsText('process.cross.title','Explora los cinco procesos.')}</h2></div></div><ProcessCardsPremium/></div></section>
+</Layout>
+
+<style>
+  .process-participation{margin-top:14px;padding-top:23px;border-top:1px solid var(--line)}
+  .process-participation p{white-space:pre-line;margin-top:11px}
+  .process-participation .text-link{margin-top:22px}
+  .route-information{padding:0 28px 26px 83px}
+  .route-description,.route-outcome p{font-size:14px;line-height:1.65;white-space:pre-line}
+  .route-outcome{margin-top:19px}
+  .route-outcome .eyebrow{font-size:10px;margin-bottom:7px}
+  .route-metadata{display:flex;flex-wrap:wrap;gap:15px 25px;margin:21px 0 0}
+  .route-metadata>div{max-width:100%}
+  .route-metadata dt{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .route-metadata dd{font-size:13px;line-height:1.5;margin:4px 0 0}
+  .route-availability{display:flex;flex-wrap:wrap;align-items:flex-end;gap:19px 25px;margin-top:22px}
+  .route-availability p{font-size:13px;line-height:1.5;white-space:pre-line}
+  .route-availability .eyebrow{font-size:10px;margin-bottom:6px;color:var(--teal-deep)}
+  .route-availability .text-link{font-size:12px;gap:12px}
+  .route-module-copy{min-width:0}
+  .route-module-copy h4{font-size:13px;line-height:1.55;font-weight:400;letter-spacing:0}
+  .route-module-copy p{font-size:13px;line-height:1.6;margin-top:8px;white-space:pre-line}
+  .route-module-copy .text-link{font-size:12px;gap:9px;margin-top:11px}
+  @media(max-width:1000px){.route-information{padding:0 22px 25px 59px}}
+  @media(max-width:700px){.route-description,.route-outcome p{font-size:14px}.route-availability{display:block}.route-availability .text-link{margin-top:15px}.route-module-copy h4{font-size:14px}}
+</style>

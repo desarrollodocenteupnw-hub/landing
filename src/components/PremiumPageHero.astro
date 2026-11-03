@@ -1,0 +1,48 @@
+---
+import Icon from './Icon.astro';
+interface Breadcrumb { label:string; href?:string; }
+interface Props {
+  eyebrow:string;
+  title:string;
+  description:string;
+  image?:string;
+  imageAlt?:string;
+  tone?:'teal'|'blue'|'navy'|'gold'|'violet'|'green';
+  breadcrumbs?:Breadcrumb[];
+  primaryLabel?:string;
+  primaryHref?:string;
+  secondaryLabel?:string;
+  secondaryHref?:string;
+  note?:string;
+}
+const {
+  eyebrow,title,description,image='',imageAlt='',tone='teal',breadcrumbs=[],
+  primaryLabel='',primaryHref='',secondaryLabel='',secondaryHref='',note=''
+}=Astro.props;
+---
+<section class={`premium-page-shell premium-page-shell--${tone}`}>
+  <div class="container">
+    {breadcrumbs.length>0&&<nav class="premium-page-breadcrumbs" aria-label="Migas de pan">
+      {breadcrumbs.map((item,index)=><>
+        {item.href?<a href={item.href}>{item.label}</a>:<span>{item.label}</span>}
+        {index<breadcrumbs.length-1&&<span aria-hidden="true">›</span>}
+      </>)}
+    </nav>}
+    <div class:list={['premium-page-card',{'premium-page-card--no-image':!image}]}>
+      <div class="premium-page-copy">
+        <span class="premium-page-eyebrow">{eyebrow}</span>
+        <h1>{title}</h1>
+        <p>{description}</p>
+        {(primaryLabel||secondaryLabel)&&<div class="premium-page-actions">
+          {primaryLabel&&primaryHref&&<a class="premium-button premium-button--dark" href={primaryHref}>{primaryLabel} <Icon name="diagonal" size={17}/></a>}
+          {secondaryLabel&&secondaryHref&&<a class="premium-page-secondary" href={secondaryHref}>{secondaryLabel} <Icon name="arrow" size={17}/></a>}
+        </div>}
+        {note&&<p class="premium-page-note">{note}</p>}
+      </div>
+      {image&&<div class="premium-page-media">
+        <img src={image} alt={imageAlt} width="1200" height="760" fetchpriority="high"/>
+        <span class="premium-page-shape" aria-hidden="true"></span>
+      </div>}
+    </div>
+  </div>
+</section>

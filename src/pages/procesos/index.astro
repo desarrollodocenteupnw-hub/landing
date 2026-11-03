@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProcessCardsPremium from '../../components/ProcessCardsPremium.astro';
+import PremiumPageHero from '../../components/PremiumPageHero.astro';
+import Icon from '../../components/Icon.astro';
+import {cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt,cmsGroup} from '../../lib/content';
+const journey=cmsGroup('processes.journey');
+---
+<Layout title={cmsText('seo.processes.title','Nuestros procesos')} active="procesos">
+  <PremiumPageHero
+    eyebrow={cmsText('processes.hero.eyebrow','Desarrollo Docente Wiener')}
+    title={cmsText('processes.hero.title','Cinco procesos. Un propósito compartido.')}
+    description={cmsText('processes.hero.body','Inducción, Formación, Acompañamiento, Evaluación y Reconocimiento se conectan para acompañar tu desarrollo y fortalecer la experiencia educativa.')}
+    image={cmsImage('processes.hero.image','/assets/gala-comunidad.webp')}
+    imageAlt={cmsAlt('processes.hero.image','Comunidad docente Wiener')}
+    tone="blue"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Procesos'}]}
+    primaryLabel={cmsTitle('processes.hero.primary','Explora los procesos')}
+    primaryHref={cmsUrl('processes.hero.primary','#procesos')}
+    secondaryLabel={cmsTitle('processes.hero.secondary','Revisa la agenda')}
+    secondaryHref={cmsUrl('processes.hero.secondary','/agenda/')}
+  />
+  <section class="premium-section processes-overview" id="procesos">
+    <div class="container">
+      <div class="premium-section-heading"><div><span class="premium-kicker premium-kicker--dark">{cmsText('processes.overview.kicker','Tu recorrido docente')}</span><h2>{cmsText('processes.overview.title','Encuentra el proceso que necesitas hoy.')}</h2></div><p>{cmsText('processes.overview.body','Cada proceso reúne propósito, recorrido, cronograma, recursos y oportunidades específicas.')}</p></div>
+      <ProcessCardsPremium/>
+      <div class="processes-journey" aria-label="Recorrido de los procesos">{journey.map(item=><div><strong>{item.titulo}</strong><span>{item.texto}</span></div>)}</div>
+      <div class="editorial-banner"><div><h3>{cmsText('processes.banner.title','Tu próximo paso está en la agenda.')}</h3><p>{cmsText('processes.banner.body','Encuentra las actividades de cada proceso y consulta sus fechas, modalidades y responsables.')}</p></div>{cmsTitle('processes.banner.cta','Consulta la agenda')&&<a class="button button--ink" href={cmsUrl('processes.banner.cta','/agenda/')}>{cmsTitle('processes.banner.cta','Consulta la agenda')} <Icon name="diagonal" size={19}/></a>}</div>
+    </div>
+  </section>
+</Layout>

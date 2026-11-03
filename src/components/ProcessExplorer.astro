@@ -1,0 +1,46 @@
+---
+import {processes,processCopy,processIconIndex,cmsText} from '../lib/content';
+import ProcessMark from './ProcessMark.astro';
+import Icon from './Icon.astro';
+---
+<div class="process-explorer" data-process-explorer>
+  <div class="process-tabs" role="tablist" aria-label={cmsText('process.explorer.aria','Explora los cinco procesos')}>
+    {processes.map((process,index)=><button type="button" id={`process-tab-${process.slug}`} role="tab" aria-selected={index===0?'true':'false'} aria-controls={`process-panel-${process.slug}`} tabindex={index===0?0:-1} data-process-tab><span>0{index+1}</span><strong>{process.eje}</strong><Icon name="diagonal" size={17}/></button>)}
+  </div>
+  <div class="process-panels">
+    {processes.map((process,index)=>{const copy=processCopy[process.slug];return <section class="process-panel" role="tabpanel" id={`process-panel-${process.slug}`} aria-labelledby={`process-tab-${process.slug}`} hidden={index!==0} data-process-panel>
+      <div class="process-scene" aria-hidden="true">
+        <svg class="process-scene-ribbon" viewBox="0 0 600 480" fill="none"><path d="M-120-50H165L417 202Q487 269 558 211L290 482Q236 532 176 478L-120 182Z"/><path d="M30-125H278L530 127Q600 194 671 136"/></svg>
+        <div class="process-scene-top"><span>{cmsText('process.explorer.top','DESARROLLO DOCENTE WIENER')}</span><span>0{index+1} / 05</span></div>
+        <ProcessMark index={processIconIndex(process.slug)}/>
+        <strong>{copy.verb}<span>.</span></strong>
+        <span class="process-scene-caption">{cmsText('process.explorer.caption','Un recorrido conectado.')}</span>
+      </div>
+      <div class="process-panel-copy">
+        <span class="eyebrow">{copy.eyebrow}</span>
+        <h3>{copy.lead}</h3>
+        <p>{process.descripcion}</p>
+        <ul>{copy.steps.map(step=><li><span aria-hidden="true"></span>{step.title}</li>)}</ul>
+        <a class="button button--ink" href={`/procesos/${process.slug}/`}>{cmsText('process.explorer.cta_prefix','Explora')} {process.eje.toLowerCase()} <Icon name="diagonal" size={18}/></a>
+      </div>
+    </section>})}
+  </div>
+</div>
+<script>
+document.querySelectorAll<HTMLElement>('[data-process-explorer]').forEach(root=>{
+  const tabs=[...root.querySelectorAll<HTMLButtonElement>('[data-process-tab]')];
+  const panels=[...root.querySelectorAll<HTMLElement>('[data-process-panel]')];
+  function activate(index:number,focus=false){
+    tabs.forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;});
+    panels.forEach((panel,i)=>{panel.hidden=i!==index;});
+    if(focus)tabs[index].focus();
+  }
+  tabs.forEach((tab,index)=>{
+    tab.addEventListener('click',()=>activate(index));
+    tab.addEventListener('keydown',event=>{
+      const destination=event.key==='ArrowRight'?(index+1)%tabs.length:event.key==='ArrowLeft'?(index+tabs.length-1)%tabs.length:event.key==='Home'?0:event.key==='End'?tabs.length-1:null;
+      if(destination!==null){event.preventDefault();activate(destination,true);}
+    });
+  });
+});
+</script>

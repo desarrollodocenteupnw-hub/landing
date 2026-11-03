@@ -1,0 +1,199 @@
+---
+import '../styles/agenda.css';
+import {cmsText} from '../lib/content';
+
+type SourceRow = Record<string, unknown>;
+interface Props {
+  data: {
+    actividades?: SourceRow[];
+    periodos?: SourceRow[];
+    ejes?: SourceRow[];
+    config?: SourceRow[];
+    [key: string]: unknown;
+  };
+  initialProcess?: string;
+  compact?: boolean;
+}
+
+const { data, initialProcess = 'Todos', compact = false } = Astro.props;
+const moduleId = `agenda-${Math.random().toString(36).slice(2, 10)}`;
+const text = (value: unknown) => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
+const periodRows = (data.periodos || []).filter((row) => text(row.periodo));
+const processRows = [...(data.ejes || [])].sort((a, b) => Number(a.orden || 9) - Number(b.orden || 9));
+const processes = [...new Set(processRows.map((row) => text(row.eje)).filter(Boolean))];
+const todayParts = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+const part = (type: string) => todayParts.find((item) => item.type === type)?.value || '';
+const today = `${part('year')}-${part('month')}-${part('day')}`;
+const sortedPeriods = [...periodRows].sort((a, b) => text(a.inicio).localeCompare(text(b.inicio)));
+const currentPeriod = sortedPeriods.find((row) => text(row.inicio) <= today && text(row.fin) >= today)
+  || [...sortedPeriods].reverse().find((row) => text(row.inicio) <= today)
+  || sortedPeriods[0];
+const initialPeriod = currentPeriod ? text(currentPeriod.periodo) : 'Todos';
+const fallbackActivities = (data.actividades || []).filter((row) =>
+  (initialPeriod === 'Todos' || text(row.periodo) === initialPeriod)
+  && (initialProcess === 'Todos' || text(row.eje) === initialProcess)
+).sort((a, b) => text(a.inicio).localeCompare(text(b.inicio)));
+const payload = JSON.stringify({ actividades: data.actividades || [], periodos: periodRows, ejes: processRows }).replace(/</g, '\\u003c');
+const agendaLabels = {
+  today: cmsText('agenda.ui.today','Hoy'),
+  title: cmsText('agenda.ui.title','Cronograma de Gestión y Desarrollo Docente'),
+  titlePrefix: cmsText('agenda.ui.title_prefix','Agenda ·'),
+  activitySingular: cmsText('agenda.ui.activity_singular','actividad'), activityPlural: cmsText('agenda.ui.activity_plural','actividades'),
+  allProcesses: cmsText('agenda.ui.all_processes_lower','todos los procesos'), allPeriods: cmsText('agenda.ui.all_periods_lower','todos los periodos'),
+  statusFuture: cmsText('agenda.ui.status_future','Por iniciar'), statusCurrent: cmsText('agenda.ui.status_current','Dentro del plazo'), statusPast: cmsText('agenda.ui.status_past','Plazo finalizado'),
+  emptyTitle: cmsText('agenda.ui.empty_title','No encontramos actividades con estos filtros'), emptyBody: cmsText('agenda.ui.empty_body','Prueba otro periodo, proceso o término de búsqueda.'), reset: cmsText('agenda.ui.reset','Restablecer filtros'),
+  dateStart: cmsText('agenda.ui.date_start','Inicia'), dateUntil: cmsText('agenda.ui.date_until','Hasta'), dateDeadline: cmsText('agenda.ui.date_deadline','Plazo hasta'), recurrent: cmsText('agenda.ui.recurrent','Durante el periodo'),
+  showAll: cmsText('agenda.ui.show_all','Ver todas las actividades'), showing: cmsText('agenda.ui.showing','de'),
+  timelineActivity: cmsText('agenda.ui.timeline.activity','Actividad'), timelineDetail: cmsText('agenda.ui.timeline.detail','Selecciona para ver el detalle'), timelineProgrammed: cmsText('agenda.ui.timeline.programmed','Periodo programado'),
+  timelineStartClose: cmsText('agenda.ui.timeline.start_close','Inicio y cierre programados'), timelineRegion: cmsText('agenda.ui.timeline.region','Cronograma completo, desplazable horizontalmente'), timelineCaptionPrefix: cmsText('agenda.ui.timeline.caption_prefix','Cronograma de'), timelineCaptionSuffix: cmsText('agenda.ui.timeline.caption_suffix','Las barras representan fechas programadas. Los nombres permanecen visibles al desplazarse.'), timelineHelp: cmsText('agenda.ui.timeline.help','Los nombres permanecen a la izquierda. Desplaza el calendario para explorar todas las fechas.'), timelineViewDetail: cmsText('agenda.ui.timeline.view_detail','Ver detalle.'),
+  periodConfirm: cmsText('agenda.ui.period_confirm','Periodo por confirmar'), confirm: cmsText('agenda.ui.confirm','Por confirmar'),
+  factStart: cmsText('agenda.ui.fact.start','Inicio'), factEnd: cmsText('agenda.ui.fact.end','Cierre'), factOwner: cmsText('agenda.ui.fact.owner','Responsable'), factModality: cmsText('agenda.ui.fact.modality','Modalidad'), factStageEditorial: cmsText('agenda.ui.fact.stage_editorial','Etapa de consulta'), factStage: cmsText('agenda.ui.fact.stage','Etapa'), factOriginGroup: cmsText('agenda.ui.fact.origin_group','Grupo de origen'), factExecution: cmsText('agenda.ui.fact.execution','Ejecución reportada'), factSource: cmsText('agenda.ui.fact.source','Fuente'), factSourceMissing: cmsText('agenda.ui.fact.source_missing','No indicada en el registro'),
+  resource: cmsText('agenda.ui.link.resource','Abrir recurso'), source: cmsText('agenda.ui.link.source','Consultar fuente'),
+  exportSelectedSingular: cmsText('agenda.ui.export.selected_singular','actividad seleccionada'), exportSelectedPlural: cmsText('agenda.ui.export.selected_plural','actividades seleccionadas'), exportPrepared: cmsText('agenda.ui.export.prepared','Se preparó un calendario con'),
+  expandAnnouncement: cmsText('agenda.ui.expand.announcement','Se muestran las'), expandAnnouncementSuffix: cmsText('agenda.ui.expand.announcement_suffix','actividades de la selección.'),
+  icsProcess: cmsText('agenda.ui.ics.process','Proceso'), icsPeriod: cmsText('agenda.ui.ics.period','Periodo'), icsOwner: cmsText('agenda.ui.ics.owner','Responsable'), icsModality: cmsText('agenda.ui.ics.modality','Modalidad'), icsPeriodMissing: cmsText('agenda.ui.ics.period_missing','No indicado'), icsRecurrent: cmsText('agenda.ui.ics.recurrent','Este evento representa la ventana programada de una actividad recurrente. Las fechas de las sesiones se comunican por separado.'), icsDisclaimer: cmsText('agenda.ui.ics.disclaimer','Fechas programadas. El paso del tiempo no confirma la ejecución de la actividad.'), icsCalendarName: cmsText('agenda.ui.ics.calendar_name','Agenda de Desarrollo Docente'),
+  programAction: cmsText('agenda.ui.program_action','Para el programa académico')
+};
+const labelsPayload = JSON.stringify(agendaLabels).replace(/</g, '\u003c');
+const humanDate = (value: unknown) => {
+  const raw = text(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw || 'Por confirmar';
+  const date = new Date(`${raw}T12:00:00Z`);
+  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== raw) return 'Fecha por confirmar';
+  return new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date);
+};
+---
+
+<section
+  id={moduleId}
+  class:list={['agenda-module', { 'agenda-module--compact': compact }]}
+  data-agenda-root
+  data-initial-process={initialProcess}
+  data-initial-period={initialPeriod}
+  data-compact={String(compact)}
+  aria-labelledby={`${moduleId}-heading`}
+>
+  <script type="application/json" data-agenda-data set:html={payload} />
+  <script type="application/json" data-agenda-labels set:html={labelsPayload} />
+
+  <header class="agenda-header">
+    <div>
+      <p class="agenda-eyebrow">{cmsText('agenda.ui.kicker','Cada proceso, en su momento')}</p>
+      <h2 id={`${moduleId}-heading`}>{initialProcess === 'Todos' ? cmsText('agenda.ui.title','Agenda de Desarrollo Docente') : `${cmsText('agenda.ui.title_prefix','Agenda de')} ${initialProcess}`}</h2>
+      <p class="agenda-intro">{cmsText('agenda.ui.intro','Explora las actividades, sus fechas y quiénes las acompañan.')}</p>
+    </div>
+    <div class="agenda-today" aria-label={cmsText('agenda.ui.current_date_aria','Fecha actual en Lima')}>
+      <span class="agenda-today-dot" aria-hidden="true"></span>
+      <span data-agenda-today>{cmsText('agenda.ui.today','Hoy')}, {humanDate(today)}</span>
+      <small>{cmsText('agenda.ui.timezone','Hora de Lima')}</small>
+    </div>
+  </header>
+
+  <form class="agenda-filters" data-agenda-filters role="search" aria-label={cmsText('agenda.ui.filter_aria','Filtrar actividades')}>
+    <label class="agenda-field">
+      <span>{cmsText('agenda.ui.period','Periodo académico')}</span>
+      <select name="periodo" data-agenda-period disabled>
+        {sortedPeriods.map((period) => <option value={text(period.periodo)} selected={text(period.periodo) === initialPeriod}>{text(period.periodo)}</option>)}
+        <option value="Todos" selected={initialPeriod === 'Todos'}>{cmsText('agenda.ui.all_periods','Todos los periodos')}</option>
+      </select>
+    </label>
+    <label class="agenda-field">
+      <span>{cmsText('agenda.ui.modality','Modalidad')}</span>
+      <select name="modalidad" data-agenda-modality disabled>
+        <option value="Todas">{cmsText('agenda.ui.all_modalities','Todas las modalidades')}</option>
+        <option value="presencial">{cmsText('agenda.ui.presential','Presencial · Lima Centro y Norte')}</option>
+        <option value="distancia">{cmsText('agenda.ui.distance','A distancia')}</option>
+      </select>
+    </label>
+    <label class="agenda-field">
+      <span>{cmsText('agenda.ui.process','Proceso')}</span>
+      <select name="proceso" data-agenda-process disabled>
+        <option value="Todos" selected={initialProcess === 'Todos'}>{cmsText('agenda.ui.all_processes','Todos los procesos')}</option>
+        {processes.map((process) => <option value={process} selected={process === initialProcess}>{process}</option>)}
+      </select>
+    </label>
+    <label class="agenda-field agenda-field--search">
+      <span>{cmsText('agenda.ui.search','Buscar una actividad')}</span>
+      <span class="agenda-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        <input type="search" name="buscar" data-agenda-search placeholder={cmsText('agenda.ui.search_placeholder','Nombre, responsable o sigla…')} autocomplete="off" disabled />
+      </span>
+    </label>
+  </form>
+
+  <div class="agenda-toolbar">
+    <div class="agenda-view-switch" role="tablist" aria-label={cmsText('agenda.ui.view_aria','Presentación de las actividades')}>
+      <button id={`${moduleId}-agenda-tab`} type="button" role="tab" aria-controls={`${moduleId}-agenda-panel`} aria-selected="true" data-agenda-view="agenda" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="3.5" cy="6" r=".7"/><circle cx="3.5" cy="12" r=".7"/><circle cx="3.5" cy="18" r=".7"/></svg>
+        {cmsText('agenda.ui.view_agenda','Agenda')}
+      </button>
+      <button id={`${moduleId}-timeline-tab`} type="button" role="tab" aria-controls={`${moduleId}-timeline-panel`} aria-selected="false" data-agenda-view="timeline" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 5h8M7 12h12M13 19h8M3 2v20"/></svg>
+        {cmsText('agenda.ui.view_timeline','Cronograma')}
+      </button>
+    </div>
+    <div class="agenda-toolbar-actions">
+      <button class="agenda-clear" type="button" data-agenda-reset disabled>{cmsText('agenda.ui.reset','Restablecer filtros')}</button>
+      <button class="agenda-export" type="button" data-agenda-export disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>
+        {cmsText('agenda.ui.save_calendar','Guardar calendario')}
+      </button>
+    </div>
+  </div>
+
+  <div class="agenda-selection" data-agenda-selection hidden>
+    <p class="agenda-result-count" data-agenda-count aria-live="polite" aria-atomic="true"></p>
+    <div class="agenda-status-counts" data-agenda-status-counts></div>
+  </div>
+
+  <div class="agenda-static">
+    <p class="agenda-static-caption">{cmsText('agenda.ui.static_prefix','Actividades de')} {initialPeriod === 'Todos' ? cmsText('agenda.ui.static_all_periods','todos los periodos') : initialPeriod}. {cmsText('agenda.ui.static_suffix','Las fechas corresponden a la programación.')}</p>
+    {fallbackActivities.length > 0 ? <ol class="agenda-static-list">
+      {fallbackActivities.map((activity) => <li>
+        <details>
+          <summary><span>{text(activity.titulo_claro) || text(activity.actividad)}</span><small>{humanDate(activity.inicio)} — {humanDate(activity.fin)}</small></summary>
+          <div class="agenda-static-detail">
+            <p><strong>{cmsText('agenda.ui.process_label','Proceso:')}</strong> {text(activity.eje)}</p>
+            <p><strong>{cmsText('agenda.ui.responsible','Responsable:')}</strong> {text(activity.responsable) || cmsText('agenda.ui.confirm','Por confirmar')}</p>
+            {text(activity.accion_programa) && <p>{text(activity.accion_programa)}</p>}
+            {text(activity.fuente) && <p><strong>{cmsText('agenda.ui.source','Fuente:')}</strong> {text(activity.fuente)}</p>}
+          </div>
+        </details>
+      </li>)}
+    </ol> : <p class="agenda-static-caption">{cmsText('agenda.ui.empty','No hay actividades registradas para esta selección.')}</p>}
+    <noscript><p class="agenda-static-caption">{cmsText('agenda.ui.noscript','Puedes consultar todas las actividades de este periodo. Activa JavaScript para filtrar, cambiar de vista o guardar el calendario.')}</p></noscript>
+  </div>
+
+  <div class="agenda-live" data-agenda-live hidden>
+    <div id={`${moduleId}-agenda-panel`} role="tabpanel" aria-labelledby={`${moduleId}-agenda-tab`} data-agenda-list></div>
+    <div id={`${moduleId}-timeline-panel`} role="tabpanel" aria-labelledby={`${moduleId}-timeline-tab`} data-agenda-timeline hidden></div>
+  </div>
+
+  <footer class="agenda-footer">
+    <span><i aria-hidden="true"></i>{cmsText('agenda.ui.status_note','Los estados describen el plazo programado.')}</span>
+    <span data-agenda-editorial hidden>{cmsText('agenda.ui.editorial_note','Las etapas de Evaluación son una agrupación editorial para facilitar la consulta.')}</span>
+  </footer>
+
+  <p class="agenda-sr-only" role="status" aria-live="polite" data-agenda-announcement></p>
+
+  <dialog class="agenda-dialog" aria-labelledby={`${moduleId}-dialog-title`} data-agenda-dialog>
+    <div class="agenda-dialog-top">
+      <span class="agenda-process-label" data-agenda-dialog-process></span>
+      <form method="dialog"><button class="agenda-dialog-close" type="submit" aria-label={cmsText('agenda.ui.close_detail','Cerrar detalle')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></form>
+    </div>
+    <div class="agenda-dialog-body">
+      <h3 id={`${moduleId}-dialog-title`} data-agenda-dialog-title></h3>
+      <p class="agenda-dialog-original" data-agenda-dialog-original hidden></p>
+      <span class="agenda-status" data-agenda-dialog-status></span>
+      <dl class="agenda-dialog-facts" data-agenda-dialog-facts></dl>
+      <div class="agenda-program-action" data-agenda-dialog-action hidden></div>
+      <p class="agenda-dialog-note" data-agenda-dialog-note hidden></p>
+      <div class="agenda-dialog-links" data-agenda-dialog-links></div>
+    </div>
+    <div class="agenda-dialog-bottom"><button type="button" class="agenda-export" data-agenda-export-one><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>{cmsText('agenda.ui.export','Guardar esta actividad')}</button><span>{cmsText('agenda.ui.calendar','Calendario .ics')}</span></div>
+  </dialog>
+</section>
+
+<script>
+  import '../scripts/agenda.ts';
+</script>

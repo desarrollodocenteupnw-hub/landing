@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import {safeLink,cmsText} from '../lib/content';
+import {galleryPhotos,communityEvent,communityCaption} from '../lib/media';
+const {full=false}=Astro.props;
+const images=galleryPhotos.slice(0,full?4:3);
+const event=communityEvent;
+---
+{images.length>0&&<>
+<div class="community-gallery" class:list={{'community-gallery--full':full}}>
+{images.map((image)=><button class="community-photo" data-gallery-open data-gallery-src={image.src} data-gallery-alt={image.alt} aria-label={`${cmsText('gallery.open','Ampliar fotografía:')} ${image.alt}`} data-reveal><img src={image.src} alt={image.alt} loading="lazy" width="800" height="1000"/><span><Icon name="plus" size={20}/></span></button>)}
+</div>
+<div class="community-caption"><p>{communityCaption}</p>{event&&safeLink(event.album_url)&&<a class="text-link" href={event.album_url} target="_blank" rel="noopener noreferrer">{cmsText('gallery.cta','Ver el álbum completo')} <Icon name="diagonal" size={17}/><span class="sr-only"> {cmsText('gallery.newtab','(abre en una nueva pestaña)')}</span></a>}</div>
+<dialog class="gallery-dialog" id="gallery-dialog" aria-labelledby="gallery-title"><div class="dialog-header"><h2 id="gallery-title">{cmsText('gallery.title','Comunidad docente Wiener')}</h2><button class="icon-button" data-dialog-close aria-label={cmsText('gallery.close','Cerrar fotografía')}><Icon name="close"/></button></div><img src={images[0].src} alt=""/><p class="gallery-caption"></p></dialog>
+</>}
+<style>.community-gallery--full{grid-template-columns:1.3fr 1fr 1fr}.community-gallery--full .community-photo:last-child{grid-column:1/-1;aspect-ratio:16/7;max-height:620px}.sr-only{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;margin:-1px;overflow:hidden;padding:0;border:0}@media(max-width:700px){.community-gallery--full{grid-template-columns:1fr 1fr}.community-gallery--full .community-photo:last-child{aspect-ratio:16/10;height:auto}}</style>

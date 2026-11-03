@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import PremiumPageHero from '../components/PremiumPageHero.astro';
+import {content,safeLink,cmsText,cmsTitle,cmsUrl,cmsImage,cmsAlt} from '../lib/content';
+---
+<Layout title={cmsText('seo.resources.title','Recursos institucionales')} active="recursos">
+  <PremiumPageHero
+    eyebrow={cmsText('resources.hero.eyebrow','Recursos institucionales')}
+    title={cmsText('resources.hero.title','El marco de nuestro trabajo.')}
+    description={cmsText('resources.hero.body','Documentos y referencias que organizan los procesos, la planificación y la evaluación del desarrollo docente.')}
+    image={cmsImage('resources.hero.image','/assets/campus.jpg')}
+    imageAlt={cmsAlt('resources.hero.image','Campus de la Universidad Norbert Wiener')}
+    tone="teal"
+    breadcrumbs={[{label:'Inicio',href:'/'},{label:'Recursos'}]}
+    primaryLabel={cmsTitle('resources.hero.primary','Explorar documentos')}
+    primaryHref={cmsUrl('resources.hero.primary','#fuentes')}
+    secondaryLabel={cmsTitle('resources.hero.secondary','Ver agenda')}
+    secondaryHref={cmsUrl('resources.hero.secondary','/agenda/')}
+  />
+  <section class="section premium-surface" id="fuentes">
+    <div class="container">
+      <div class="section-header"><div><span class="eyebrow">{cmsText('resources.section.kicker','Documentos de referencia')}</span><h2>{cmsText('resources.section.title','Fuentes para consultar.')}</h2></div><p>{cmsText('resources.section.body','Accede a la documentación institucional que sustenta los procesos y lineamientos del área.')}</p></div>
+      <div class="resource-cards">{content.documentos.map((resource,index)=><article class="resource-card-premium">
+        <span class="resource-card-index">0{index+1}</span>
+        <div><h3>{resource.nombre}</h3><p>{resource.descripcion}</p><p class="resource-card-meta">{resource.codigo}{resource.version?` · ${resource.version}`:''}</p></div>
+        <div class="resource-card-action">{safeLink(resource.url)?<a class="premium-button premium-button--dark" href={resource.url} target="_blank" rel="noopener noreferrer">{cmsText('resources.open','Abrir documento')} <Icon name="diagonal" size={17}/></a>:<span class="resource-pending">{cmsText('resources.pending','Referencia institucional · enlace pendiente de publicación')}</span>}</div>
+      </article>)}</div>
+      <p class="resource-note" style="margin-top:24px">{cmsText('resources.note','Las fechas, metas y actividades del portal proceden de la planificación incluida en estas referencias. El periodo de cada actividad se conserva en la agenda.')}</p>
+      <div class="editorial-banner"><div><h3>{cmsText('resources.banner.title','Ubica a los responsables de cada actividad.')}</h3><p>{cmsText('resources.banner.body','Abre el detalle en la agenda para consultar responsable, acción del programa y fuente.')}</p></div>{cmsTitle('resources.banner.cta','Ir a la agenda')&&<a class="button button--ink" href={cmsUrl('resources.banner.cta','/agenda/')}>{cmsTitle('resources.banner.cta','Ir a la agenda')} <Icon name="diagonal" size={18}/></a>}</div>
+    </div>
+  </section>
+</Layout>

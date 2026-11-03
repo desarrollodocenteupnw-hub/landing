@@ -1,0 +1,90 @@
+[
+  {
+    "id_evento": "EV-01",
+    "archivo": "conectados-excelencia-2026.webp",
+    "url_imagen": "https://www.uwiener.edu.pe/wp-content/uploads/2026/10/2-2026-10-21T122905.774.jpg",
+    "url_noticia": "https://www.uwiener.edu.pe/noticias/docentes-destacados-de-la-universidad-norbert-wiener-recibieron-reconocimiento-por-su-excelente-labor-en-el-periodo-academico-2026-i/",
+    "dimensiones_originales": [
+      1000,
+      550
+    ],
+    "bytes_originales": 417674,
+    "ruta_portal": "/assets/eventos/conectados-excelencia-2026.webp",
+    "dimensiones": [
+      1000,
+      550
+    ],
+    "bytes": 88054,
+    "origen": "Universidad Norbert Wiener · noticia institucional",
+    "imagen_alt": "Docentes reconocidos posan con sus diplomas en el encuentro Conectados con la Excelencia.",
+    "encuadre_sugerido": "50% 50%",
+    "tratamiento": "Conversión a WebP, calidad 88, composición y dimensiones completas; sin retoque ni cambios de personas.",
+    "inspeccion_visual": true
+  },
+  {
+    "id_evento": "EV-04",
+    "archivo": "conectados-rector-2025.webp",
+    "url_imagen": "https://www.uwiener.edu.pe/wp-content/uploads/2025/10/mobile3_1-100.jpg",
+    "url_noticia": "https://www.uwiener.edu.pe/noticias/docentes-de-la-universidad-norbert-wiener-recibieron-el-reconocimiento-a-su-labor-en-encuentro-de-confraternidad-con-el-rector/",
+    "dimensiones_originales": [
+      1001,
+      551
+    ],
+    "bytes_originales": 389613,
+    "ruta_portal": "/assets/eventos/conectados-rector-2025.webp",
+    "dimensiones": [
+      1001,
+      551
+    ],
+    "bytes": 65494,
+    "origen": "Universidad Norbert Wiener · noticia institucional",
+    "imagen_alt": "Participantes del encuentro Conectados con el Rector reunidos en el auditorio de la universidad.",
+    "encuadre_sugerido": "50% 50%",
+    "tratamiento": "Conversión a WebP, calidad 88, composición y dimensiones completas; sin retoque ni cambios de personas.",
+    "inspeccion_visual": true
+  },
+  {
+    "id_evento": "EV-05",
+    "archivo": "buenas-practicas-ia-2025.webp",
+    "url_imagen": "https://www.uwiener.edu.pe/wp-content/uploads/2025/12/2-2025-12-23T164547.572.jpg",
+    "url_noticia": "https://www.uwiener.edu.pe/noticias/aplicacion-de-la-ia-en-la-ensenanza-universitaria-fue-el-tema-de-la-segunda-jornada-de-buenas-practicas-docentes-organizado-por-la-universidad-norbert-wiener/",
+    "dimensiones_originales": [
+      1000,
+      550
+    ],
+    "bytes_originales": 140471,
+    "ruta_portal": "/assets/eventos/buenas-practicas-ia-2025.webp",
+    "dimensiones": [
+      1000,
+      550
+    ],
+    "bytes": 32070,
+    "origen": "Universidad Norbert Wiener · noticia institucional",
+    "imagen_alt": "Presentación de una experiencia de inteligencia artificial durante la II Jornada de Buenas Prácticas Docentes.",
+    "encuadre_sugerido": "50% 50%",
+    "tratamiento": "Conversión a WebP, calidad 88, composición y dimensiones completas; sin retoque ni cambios de personas.",
+    "inspeccion_visual": true
+  },
+  {
+    "id_evento": "EV-07",
+    "archivo": "buenas-practicas-2024.webp",
+    "url_imagen": "https://www.uwiener.edu.pe/wp-content/uploads/2025/09/11-3.jpg",
+    "url_noticia": "https://www.uwiener.edu.pe/noticias/docentes-de-la-universidad-norbert-wiener-participaron-en-jornadas-de-capacitacion/",
+    "dimensiones_originales": [
+      1772,
+      1235
+    ],
+    "bytes_originales": 656825,
+    "ruta_portal": "/assets/eventos/buenas-practicas-2024.webp",
+    "dimensiones": [
+      1772,
+      1235
+    ],
+    "bytes": 165456,
+    "origen": "Universidad Norbert Wiener · noticia institucional",
+    "imagen_alt": "Participantes de la Jornada de Buenas Prácticas Docentes reunidos en el auditorio de la universidad.",
+    "encuadre_sugerido": "50% 100%",
+    "tratamiento": "Conversión a WebP, calidad 88, composición y dimensiones completas; sin retoque ni cambios de personas.",
+    "inspeccion_visual": true
+  }
+]

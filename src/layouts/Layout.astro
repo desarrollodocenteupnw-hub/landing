@@ -1,0 +1,75 @@
+---
+import '../styles/global.css';
+import '../styles/experience.css';
+import '../styles/premium-system.css';
+import Icon from '../components/Icon.astro';
+import {heroPhoto} from '../lib/media';
+import {searchItems,processes,navItems,footerLinks,searchLinks,cmsText,cmsTitle,cmsUrl} from '../lib/content';
+interface Props { title?:string; description?:string; active?:string; home?:boolean; minimal?:boolean; }
+const defaultTitle=cmsText('seo.default.title','Desarrollo Docente');
+const defaultDescription=cmsText('seo.default.description','Conoce los procesos, las oportunidades y la agenda de Desarrollo Docente de la Universidad Norbert Wiener.');
+const universityName=cmsText('global.brand.university','Universidad Norbert Wiener');
+const {title=defaultTitle, description=defaultDescription,active='',home=false,minimal=false}=Astro.props;
+const areaName=cmsText('global.brand.area','Dirección de Gestión y Desarrollo Docente');
+const presentLabel=cmsText('global.header.presentar','Presentar');
+const footerCta={label:cmsTitle('global.footer.cta','Conoce al equipo'),url:cmsUrl('global.footer.cta','/el-area/#equipo')};
+const sources={label:cmsTitle('global.footer.sources','Fuentes'),url:cmsUrl('global.footer.sources','/recursos/#fuentes')};
+const uiLabels={
+  searchMin:cmsText('global.search.minchars','Escribe al menos dos caracteres para buscar.'),
+  searchSingular:cmsText('global.search.singular','coincidencia'),
+  searchPlural:cmsText('global.search.plural','coincidencias'),
+  searchLimit:cmsText('global.search.limit','Mostrando las primeras 12.'),
+  searchEmpty:cmsText('global.search.empty','No encontramos coincidencias. Prueba con otro proceso, fecha o actividad.'),
+  motionOn:cmsText('global.motion.on','Activar animaciones'),
+  motionOff:cmsText('global.motion.off','Reducir movimiento'),
+  motionHint:cmsText('global.motion.hint','Activa las animaciones para repetir la introducción'),
+  upcomingClose:cmsText('home.upcoming.close','Cierre del plazo'),
+  upcomingStart:cmsText('home.upcoming.start','Inicio'),
+  upcomingEmpty:cmsText('home.upcoming.empty','No hay próximas fechas publicadas. Puedes consultar el calendario y los periodos anteriores.'),
+  upcomingContext:cmsText('home.upcoming.context','Fechas próximas al')
+};
+---
+<!doctype html>
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#07C8CC"/>
+  <meta name="description" content={description}/>
+  <meta property="og:type" content="website"/><meta property="og:title" content={`${title} · ${universityName}`}/><meta property="og:description" content={description}/>
+  <title>{title} · {universityName}</title>
+  <link rel="icon" href="/assets/wiener-dark.png" type="image/png"/>
+  <link rel="preload" href="/fonts/hanken-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin/>
+  <link rel="preload" href="/fonts/n27-medium.woff2" as="font" type="font/woff2" crossorigin/>
+  {home && <link rel="preload" as="image" href={heroPhoto.src}/>} 
+  <script is:inline>
+    (()=>{let p='';try{p=localStorage.getItem('wiener-motion')||''}catch{};document.documentElement.dataset.motion=p==='reduced'||(!p&&matchMedia('(prefers-reduced-motion: reduce)').matches)?'reduced':'full';})();
+  </script>
+</head>
+<body class:list={{'is-home':home,'is-presentation':minimal}}>
+  <a class="skip-link" href="#contenido">{cmsText('global.skip','Ir al contenido')}</a>
+  {!minimal && <header class="site-header" id="header">
+    <a class="brand" href="/" aria-label={cmsText('global.brand.home_aria','Desarrollo Docente, inicio')}><img src="/assets/wiener-dark.png" alt={cmsText('global.brand.alt','Universidad Norbert Wiener')} width="174" height="38"/><span class="brand-divider"></span><span class="brand-area">{areaName.split('\n').map((line,index)=><>{index>0&&<br/>}{line}</>)}</span></a>
+    <nav aria-label={cmsText('global.nav.aria','Navegación principal')} class="desktop-nav">{navItems.map(item=><a href={item.url} aria-current={active===item.key?'page':undefined}>{item.label}</a>)}</nav>
+    <div class="header-actions"><button class="icon-button" data-search-open aria-label={cmsText('global.header.search_aria','Buscar en el portal')}><Icon name="search" size={20}/></button><a href="/presentar/" class="presentation-link"><Icon name="play" size={15}/>{presentLabel}</a><button class="icon-button mobile-menu-button" data-menu-open aria-label={cmsText('global.header.menu_aria','Abrir menú')}><Icon name="menu"/></button></div>
+  </header>}
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  {home && <div class="brand-intro" id="brand-intro" role="dialog" aria-modal="true" aria-label={cmsText('global.intro.aria','Presentación de Desarrollo Docente')} hidden>
+    <div class="intro-brand" aria-hidden="true"><img src="/assets/wiener-dark.png" alt="" width="190" height="42"/></div>
+    <svg class="intro-ribbon" viewBox="0 0 900 800" fill="none" aria-hidden="true"><path d="M-140-30H270L594 294Q678 374 764 305L395 674Q319 748 236 670L-140 294Z"/></svg>
+    <div class="intro-sequence" aria-hidden="true"><span class="intro-word intro-word--one">{cmsText('intro.1','Conectamos.')}</span><span class="intro-word intro-word--two">{cmsText('intro.2','Impulsamos.')}</span><span class="intro-word intro-word--final">{cmsText('intro.3','Desarrollo Docente.')}</span></div>
+    <div class="intro-processes" aria-hidden="true">{processes.map(process=><span>{process.eje}</span>)}</div>
+    <div class="intro-track" aria-hidden="true"><span></span></div>
+    <button class="intro-skip" data-intro-skip>{cmsText('intro.skip','Saltar introducción')} <Icon size={17}/></button>
+  </div>}
+  <main id="contenido" tabindex="-1"><slot/></main>
+  {!minimal && <footer class="site-footer">
+    <div class="container footer-top"><div><span class="eyebrow">{cmsText('global.footer.eyebrow',areaName)}</span><h2>{cmsText('global.footer.title','Sigamos construyendo una docencia de excelencia.')}</h2><p>{cmsText('global.footer.body','Acompañamos a nuestra comunidad docente con información, formación, orientación, evaluación y reconocimiento.')}</p>{footerCta.label&&footerCta.url&&<a href={footerCta.url} class="button button--ink">{footerCta.label} <Icon name="diagonal" size={19}/></a>}</div><div class="footer-links"><div><h3>{cmsText('global.footer.links_title','Accesos útiles')}</h3>{footerLinks.map(link=><a href={link.url}>{link.label}</a>)}</div></div></div>
+    <div class="container footer-bottom"><img src="/assets/wiener-light.png" alt={cmsText('global.brand.alt','Universidad Norbert Wiener')} width="160" height="36"/><p>{areaName} <span>{universityName}</span></p><div class="footer-utilities"><button data-motion-toggle>{cmsText('global.footer.motion','Reducir movimiento')}</button>{home&&<button data-intro-replay>{cmsText('global.footer.replay','Repetir intro')}</button>}{sources.label&&sources.url&&<a href={sources.url}>{sources.label}</a>}</div></div>
+  </footer>}
+  <dialog class="navigation-dialog" id="navigation-dialog" aria-labelledby="navigation-title"><div class="dialog-header"><span id="navigation-title" class="eyebrow">{cmsText('global.mobile.title','Explora Desarrollo Docente')}</span><button class="icon-button" data-dialog-close aria-label={cmsText('global.dialog.menu_close','Cerrar menú')}><Icon name="close"/></button></div><nav aria-label={cmsText('global.nav.mobile_aria','Navegación móvil')}>{navItems.map((item,index)=><a href={item.url} aria-current={active===item.key?'page':undefined}><span class="index">{String(index+1).padStart(2,'0')}</span>{item.label}<Icon name="diagonal"/></a>)}</nav><a class="button button--teal" href="/presentar/"><Icon name="play" size={18}/> {cmsText('global.mobile.presentation','Modo presentación')}</a></dialog>
+  <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-title"><div class="dialog-header"><h2 id="search-title">{cmsText('global.search.title','¿Qué quieres encontrar?')}</h2><button class="icon-button" data-dialog-close aria-label={cmsText('global.dialog.search_close','Cerrar búsqueda')}><Icon name="close"/></button></div><label class="search-field"><Icon name="search"/><input type="search" id="site-search" placeholder={cmsText('global.search.placeholder','Procesos, actividades, eventos…')} autocomplete="off"/><span class="key-hint">ESC</span></label><p class="search-status" aria-live="polite" id="search-status">{cmsText('global.search.status','Busca en los cinco procesos de Desarrollo Docente.')}</p><div class="search-results" id="search-results"></div><div class="search-suggestions"><span>{cmsText('global.search.direct','Accesos directos')}</span>{searchLinks.map(link=><a href={link.url}>{link.label}</a>)}</div></dialog>
+  <script type="application/json" id="search-index" set:html={JSON.stringify(searchItems).replace(/</g,'\\u003c')}/>
+  <script type="application/json" id="ui-labels" set:html={JSON.stringify(uiLabels).replace(/</g,'\\u003c')}/>
+  <script>import '../scripts/site';</script>
+</body>
+</html>
