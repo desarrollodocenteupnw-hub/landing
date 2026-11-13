@@ -226,3 +226,8 @@ La galería admite `galeria_destacados` (IDs de fotos separados por comas) y la 
 El portal aplica un sistema visual unificado inspirado en el master aprobado para DGDD: hero fotográfico, tarjetas de procesos con identidad propia, navegación secundaria por proceso, superficies editoriales, uso institucional de Norby y tipografías N27 + Hanken Grotesk. La actualización cubre Inicio, Nuestra Dirección, Procesos, los cinco procesos, Recursos, Agenda, Innovación, Resultados, eventos y 404.
 
 La lógica de cronograma/Agenda y sus datos se conservan sin cambios funcionales en esta etapa. La actualización del Gantt 2027 se realizará sobre esta base visual.
+
+
+## Resultados por proceso y nivel
+
+La pestaña `indicadores` admite `nivel` (Institucional, Pregrado, Segundas Especialidades, Maestrías) y `visible` (`si/no`). Los selectores de nivel y periodo se generan automáticamente con los datos publicados; no requieren editar HTML.

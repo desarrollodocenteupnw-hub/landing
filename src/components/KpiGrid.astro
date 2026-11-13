@@ -1,11 +1,39 @@
 ---
-import {content,formatDate,cmsText} from '../lib/content';
-const {process='', showHeading=true}=Astro.props;
-const rows=content.kpis.filter(k=>!process || k.eje===process);
+import {content,formatDate,cmsText,slugify} from '../lib/content';
+const {process=''}=Astro.props;
+const clean=(value:unknown)=>value===undefined||value===null?'':String(value).trim();
+const canonicalLevel=(value:unknown)=>{
+  const raw=clean(value);if(!raw)return 'Institucional';
+  const key=slugify(raw);
+  if(key==='institucional')return 'Institucional';
+  if(key==='pregrado')return 'Pregrado';
+  if(['segunda-especialidad','segundas-especialidades','segunda-especialidades','segundas-especialidad'].includes(key))return 'Segundas Especialidades';
+  if(['maestria','maestrias'].includes(key))return 'Maestrías';
+  return raw;
+};
+const visible=(value:unknown)=>!/^(no|false|0)$/i.test(clean(value)||'si');
+const periodRank=(period:string)=>{
+  const declared=content.periodos.findIndex((row:any)=>clean(row.periodo)===period);
+  if(declared>=0)return declared;
+  const match=period.match(/(\d{4})(?:-(I{1,2}))?/i);
+  if(!match)return -1;
+  const semester=match[2]?.toUpperCase()==='II'?2:match[2]?.toUpperCase()==='I'?1:0;
+  return Number(match[1])*10+semester;
+};
+const allRows=content.kpis.filter((k:any)=>(!process || k.eje===process)&&visible(k.visible)).map((row:any)=>({...row,nivel:canonicalLevel(row.nivel)}));
+const levels=[...new Set(allRows.map((row:any)=>row.nivel))];
+const displayLevel=levels.includes('Institucional')?'Institucional':(levels[0]||'Institucional');
+const sourceRows=allRows.filter((row:any)=>row.nivel===displayLevel);
+const grouped=new Map<string,any[]>();
+sourceRows.forEach((row:any)=>{
+  const key=`${clean(row.eje)}::${clean(row.indicador).toLocaleLowerCase('es')}`;
+  const group=grouped.get(key)||[];group.push(row);grouped.set(key,group);
+});
+const rows=[...grouped.values()].map(group=>[...group].sort((a,b)=>periodRank(clean(a.periodo))-periodRank(clean(b.periodo))).at(-1)).filter(Boolean);
 ---
 <div class="kpi-grid">
-{rows.map((kpi)=><article class="kpi-card" data-reveal>
-  <div class="kpi-label"><span>{kpi.eje}</span><span>{kpi.periodo}</span></div>
+{rows.map((kpi:any)=><article class="kpi-card" data-reveal>
+  <div class="kpi-label"><span>{kpi.eje} · {displayLevel}</span><span>{kpi.periodo}</span></div>
   <h3>{kpi.indicador}</h3>
   <div class="kpi-numbers"><div><span class="micro">{cmsText('kpi.meta','Meta')}</span><strong>{kpi.meta}<small>{kpi.unidad}</small></strong></div><div><span class="micro">{cmsText('kpi.result','Resultado')}</span>{kpi.valor!=='' && kpi.valor!==null && kpi.valor!==undefined ? <strong>{kpi.valor}<small>{kpi.unidad}</small></strong> : <p class="pending-result">{cmsText('kpi.pending','Pendiente de publicación')}</p>}</div></div>
   {'fecha_corte' in kpi && kpi.fecha_corte && <p class="kpi-cutoff">{cmsText('kpi.cutoff','Corte del resultado:')} {formatDate(String(kpi.fecha_corte))}</p>}

@@ -4,7 +4,7 @@
  * utiliza las mismas reglas y transformaciones que el publicador.
  */
 var DGDD_SCHEMA = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   timeZone: 'America/Lima',
   coreAxes: ['Inducción', 'Formación', 'Acompañamiento', 'Evaluación', 'Reconocimiento'],
   auxiliaryAxes: { carrera_docente: 'Carrera docente' },
@@ -16,9 +16,11 @@ var DGDD_SCHEMA = {
   },
   executionStates: ['', 'pendiente', 'en_ejecucion', 'completada', 'pausada'],
   publicationStates: ['borrador', 'publicado', 'archivado'],
+  resultLevels: ['Institucional', 'Pregrado', 'Segundas Especialidades', 'Maestrías'],
   // Ampliación compatible: las hojas ya creadas pueden omitir estas columnas.
   optionalColumns: {
-    eventos: ['slug', 'fecha_publicacion', 'fecha_texto', 'hora', 'tema', 'procesos_relacionados', 'imagen', 'imagen_alt', 'fuente']
+    eventos: ['slug', 'fecha_publicacion', 'fecha_texto', 'hora', 'tema', 'procesos_relacionados', 'imagen', 'imagen_alt', 'fuente'],
+    indicadores: ['nivel', 'visible']
   },
   requiredCollections: ['config', 'periodos', 'ejes', 'actividades', 'eventos', 'kpis', 'formacion', 'documentos', 'equipo', 'galeria', 'iniciativas', 'contenido'],
   sheets: {
@@ -27,7 +29,7 @@ var DGDD_SCHEMA = {
     procesos: ['proceso_id', 'eje', 'orden', 'descripcion', 'beneficio', 'publico', 'como_participar', 'url', 'estado_publicacion'],
     actividades: ['id', 'proceso_id', 'grupo', 'fase', 'actividad', 'periodo', 'inicio', 'fin', 'responsable', 'tipo', 'modalidad', 'fuente', 'nota', 'hito', 'titulo_claro', 'accion_programa', 'estado_ejecucion', 'fecha_cumplimiento', 'estado_publicacion'],
     eventos: ['id', 'proceso_id', 'nombre', 'edicion', 'inicio', 'fin', 'descripcion', 'estado', 'url', 'album_url', 'cifra_1', 'cifra_1_texto', 'cifra_2', 'cifra_2_texto', 'modalidad', 'lugar', 'publico', 'slug', 'fecha_publicacion', 'fecha_texto', 'hora', 'tema', 'procesos_relacionados', 'imagen', 'imagen_alt', 'fuente', 'estado_publicacion'],
-    indicadores: ['id', 'proceso_id', 'indicador', 'meta', 'valor', 'unidad', 'periodo', 'fecha_corte', 'fuente', 'universo', 'estado_publicacion'],
+    indicadores: ['id', 'proceso_id', 'indicador', 'meta', 'valor', 'unidad', 'periodo', 'nivel', 'visible', 'fecha_corte', 'fuente', 'universo', 'estado_publicacion'],
     oferta_formativa: ['id', 'tipo', 'ruta_id', 'linea', 'modulo', 'titulo', 'insignia', 'descripcion', 'resultado_aprendizaje', 'publico', 'duracion', 'modalidad', 'disponibilidad', 'url', 'orden', 'estado_publicacion'],
     iniciativas: ['id', 'proceso_id', 'titulo', 'desafio', 'intervencion', 'aplicacion', 'evidencia', 'aprendizaje', 'estado', 'periodo', 'url', 'imagen_url', 'orden', 'estado_publicacion'],
     recursos: ['recurso_id', 'tipo', 'titulo', 'codigo', 'version', 'descripcion', 'url', 'evento_id', 'drive_file_id', 'archivo', 'destacada', 'pie', 'orden', 'estado_publicacion'],

@@ -2095,7 +2095,9 @@
       "meta": 90,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Inducción",
@@ -2103,7 +2105,9 @@
       "meta": 80,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Formación",
@@ -2111,7 +2115,9 @@
       "meta": 70,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Formación",
@@ -2119,7 +2125,9 @@
       "meta": 80,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Acompañamiento",
@@ -2127,7 +2135,9 @@
       "meta": 100,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Acompañamiento",
@@ -2135,7 +2145,9 @@
       "meta": 80,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Evaluación",
@@ -2143,7 +2155,9 @@
       "meta": 50,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Reconocimiento",
@@ -2151,7 +2165,9 @@
       "meta": 100,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026-II"
+      "periodo": "2026-II",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "eje": "Carrera docente",
@@ -2159,7 +2175,9 @@
       "meta": 10,
       "valor": "",
       "unidad": "%",
-      "periodo": "2026"
+      "periodo": "2026",
+      "nivel": "Institucional",
+      "visible": "si"
     }
   ],
   "formacion": [
@@ -13099,6 +13117,246 @@
       "orden": 0,
       "visible": "si",
       "estado_publicacion": "publicado"
+    },
+    {
+      "id": "process.results.kicker",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seguimiento del proceso",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 1,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.title",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Resultados para seguir avanzando.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 2,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.body",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Consulta el resultado disponible, su meta y la evolución histórica publicada para este proceso.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 3,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.period",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Periodo",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 4,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.period_aria",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seleccionar periodo de resultados",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 5,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.all",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Consulta todos los procesos",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 6,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.level",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Nivel",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 7,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.level_aria",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seleccionar nivel de resultados",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 8,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.last_published",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Último publicado",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 9,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.trend",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Tendencia del indicador",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 10,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.no_history",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "El histórico aparecerá cuando se publiquen al menos dos periodos.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 11,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.progress",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Avance sobre la meta",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 12,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.vs_previous",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Vs. periodo anterior",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 13,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.empty_title",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Resultados en preparación",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 14,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.empty",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "La sección quedará disponible cuando se publiquen indicadores para este proceso desde Google Sheets.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 15,
+      "visible": "si"
     }
   ]
 }

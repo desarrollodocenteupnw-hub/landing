@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "timeZone": "America/Lima",
   "publicationStates": [
     "borrador",
@@ -30,6 +30,10 @@
       "imagen",
       "imagen_alt",
       "fuente"
+    ],
+    "indicadores": [
+      "nivel",
+      "visible"
     ]
   },
   "sheets": {
@@ -114,6 +118,8 @@
       "valor",
       "unidad",
       "periodo",
+      "visible",
+      "nivel",
       "fecha_corte",
       "fuente",
       "universo",
@@ -195,5 +201,11 @@
       "visible",
       "estado_publicacion"
     ]
-  }
+  },
+  "resultLevels": [
+    "Institucional",
+    "Pregrado",
+    "Segundas Especialidades",
+    "Maestrías"
+  ]
 }

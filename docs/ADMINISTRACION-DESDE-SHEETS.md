@@ -22,7 +22,7 @@ Use `eventos`. Puede cargar nombre, edición, fechas, enlace, modalidad, lugar, 
 
 ### Quiero cambiar una meta o resultado
 
-Use `indicadores`. No confunda `meta` con `valor`. Todo resultado debe llevar `fecha_corte` y `fuente`.
+Use `indicadores`. No confunda `meta` con `valor`. Todo resultado debe llevar `fecha_corte` y `fuente`. Use `nivel` para Institucional, Pregrado, Segundas Especialidades o Maestrías y `visible=si/no` para activar u ocultar cada fila. El selector de nivel del portal se genera automáticamente.
 
 ### Quiero cambiar una ruta o módulo de formación
 

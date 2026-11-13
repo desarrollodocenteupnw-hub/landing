@@ -1,0 +1,220 @@
+---
+import Icon from './Icon.astro';
+import {content,currentPeriod,cmsText,formatDate,slugify} from '../lib/content';
+
+const {process=''}=Astro.props;
+const clean=(value:unknown)=>value===undefined||value===null?'':String(value).trim();
+const hasValue=(value:unknown)=>clean(value)!=='' && Number.isFinite(Number(value));
+const isVisible=(value:unknown)=>!/^(no|false|0)$/i.test(clean(value)||'si');
+const canonicalLevel=(value:unknown)=>{
+  const raw=clean(value);
+  if(!raw)return 'Institucional';
+  const key=slugify(raw);
+  if(key==='institucional')return 'Institucional';
+  if(key==='pregrado')return 'Pregrado';
+  if(['segunda-especialidad','segundas-especialidades','segunda-especialidades','segundas-especialidad'].includes(key))return 'Segundas Especialidades';
+  if(['maestria','maestrias'].includes(key))return 'Maestrías';
+  return raw;
+};
+const levelOrder=['Institucional','Pregrado','Segundas Especialidades','Maestrías'];
+const periodRank=(period:string)=>{
+  const declared=content.periodos.findIndex((row:any)=>clean(row.periodo)===period);
+  if(declared>=0)return declared;
+  const match=period.match(/(\d{4})(?:-(I{1,2}))?/i);
+  if(!match)return -1;
+  const semester=match[2]?.toUpperCase()==='II'?2:match[2]?.toUpperCase()==='I'?1:0;
+  return Number(match[1])*10+semester;
+};
+const rows=(content.kpis||[])
+  .filter((row:any)=>clean(row.eje)===process && clean(row.indicador) && isVisible(row.visible))
+  .map((row:any)=>({...row,nivel:canonicalLevel(row.nivel)}));
+const levels=[...new Set(rows.map((row:any)=>row.nivel))].sort((a,b)=>{
+  const ai=levelOrder.indexOf(a), bi=levelOrder.indexOf(b);
+  if(ai>=0||bi>=0)return (ai<0?999:ai)-(bi<0?999:bi);
+  return a.localeCompare(b,'es');
+});
+const periodsByLevel=Object.fromEntries(levels.map(level=>[
+  level,
+  [...new Set(rows.filter((row:any)=>row.nivel===level).map((row:any)=>clean(row.periodo)).filter(Boolean))].sort((a,b)=>periodRank(a)-periodRank(b))
+]));
+const defaultLevel=levels.includes('Institucional')?'Institucional':(levels[0]||'Institucional');
+const defaultLevelPeriods=periodsByLevel[defaultLevel]||[];
+const defaultPeriod=defaultLevelPeriods.includes(currentPeriod)?currentPeriod:(defaultLevelPeriods.at(-1)||currentPeriod);
+const fmt=(value:number|null,unit:string)=>value===null?'—':`${Number.isInteger(value)?value:value.toFixed(1)}${unit}`;
+const deltaFmt=(value:number|null,unit:string)=>value===null?'—':`${value>=0?'+':''}${value.toFixed(1)}${unit==='%'?' p.p.':unit}`;
+const trendPoints=(history:any[])=>{
+  if(history.length<2)return '';
+  const values=history.map(row=>Number(row.valor));
+  const min=Math.min(...values), max=Math.max(...values);
+  const spread=Math.max(max-min,1);
+  return history.map((row,index)=>{
+    const x=history.length===1?50:8+(index/(history.length-1))*84;
+    const y=78-((Number(row.valor)-min)/spread)*48;
+    return `${x},${y}`;
+  }).join(' ');
+};
+const buildItem=(group:any[],period:string)=>{
+  const ordered=[...group].sort((a,b)=>periodRank(clean(a.periodo))-periodRank(clean(b.periodo)));
+  const selected=ordered.find(row=>clean(row.periodo)===period);
+  if(!selected)return null;
+  const uptoSelected=ordered.filter(row=>periodRank(clean(row.periodo))<=periodRank(period));
+  const published=uptoSelected.filter(row=>hasValue(row.valor));
+  const latestPublished=published.at(-1)||null;
+  const selectedHasResult=hasValue(selected.valor);
+  const previousPublished=selectedHasResult
+    ? published.filter(row=>clean(row.periodo)!==period).at(-1)||null
+    : published.length>1?published.at(-2)||null:null;
+  const result=selectedHasResult?Number(selected.valor):null;
+  const meta=hasValue(selected.meta)?Number(selected.meta):latestPublished&&hasValue(latestPublished.meta)?Number(latestPublished.meta):null;
+  const delta=result!==null&&previousPublished?result-Number(previousPublished.valor):null;
+  const advance=result!==null&&meta!==null&&meta!==0?(result/meta)*100:null;
+  const history=published.slice(-5);
+  const unit=clean(selected.unidad||latestPublished?.unidad||group[0]?.unidad);
+  return {indicator:clean(group[0].indicador),selected,latestPublished,previousPublished,result,meta,delta,advance,history,unit};
+};
+const views=levels.flatMap(level=>{
+  const levelRows=rows.filter((row:any)=>row.nivel===level);
+  const groups=new Map<string,any[]>();
+  levelRows.forEach((row:any)=>{
+    const key=clean(row.indicador).toLocaleLowerCase('es');
+    const group=groups.get(key)||[];group.push(row);groups.set(key,group);
+  });
+  return (periodsByLevel[level]||[]).map(period=>({
+    level,
+    period,
+    items:[...groups.values()].map(group=>buildItem(group,period)).filter(Boolean)
+  }));
+});
+const componentId=`process-results-${slugify(process||'proceso')}`;
+---
+<section class="process-results" id="resultados" data-process-results-root data-period-map={JSON.stringify(periodsByLevel)} data-default-level={defaultLevel} data-default-period={defaultPeriod}>
+  <div class="container">
+    <div class="process-results-head" data-reveal>
+      <div>
+        <span class="eyebrow">{cmsText('process.results.kicker','Seguimiento del proceso')}</span>
+        <h2>{cmsText('process.results.title','Resultados para seguir avanzando.')}</h2>
+        <p>{cmsText('process.results.body','Consulta el resultado disponible, su meta y la evolución histórica publicada para este proceso.')}</p>
+      </div>
+      <div class="process-results-tools">
+        {levels.length>0&&<label class="result-period-control">
+          <span>{cmsText('process.results.period','Periodo')}</span>
+          <select data-result-period aria-label={cmsText('process.results.period_aria','Seleccionar periodo de resultados')}>
+            {defaultLevelPeriods.map(period=><option value={period} selected={period===defaultPeriod}>{period}</option>)}
+          </select>
+        </label>}
+        <a class="text-link" href="/resultados/">{cmsText('process.results.all','Consulta todos los procesos')} <Icon name="diagonal" size={17}/></a>
+      </div>
+    </div>
+
+    {levels.length>1&&<div class="result-level-selector" data-reveal>
+      <span class="result-level-label">{cmsText('process.results.level','Nivel')}</span>
+      <div class="result-level-tabs" role="group" aria-label={cmsText('process.results.level_aria','Seleccionar nivel de resultados')}>
+        {levels.map(level=><button type="button" class="result-level-tab" data-result-level={level} aria-pressed={level===defaultLevel?'true':'false'}>{level}</button>)}
+      </div>
+    </div>}
+
+    {views.length>0 ? <div class="process-result-views" id={componentId}>
+      {views.map(view=><div class="process-results-view" data-results-view data-level={view.level} data-period={view.period} hidden={!(view.level===defaultLevel&&view.period===defaultPeriod)}>
+        {view.items.length>0?<div class="process-results-grid">
+          {view.items.map((item,index)=>{
+            const trend=trendPoints(item.history);
+            const cutoff=clean(item.result!==null?item.selected?.fecha_corte:item.latestPublished?.fecha_corte);
+            const source=clean(item.result!==null?item.selected?.fuente:item.latestPublished?.fuente);
+            const reference=item.result===null&&item.latestPublished?`${fmt(Number(item.latestPublished.valor),item.unit)} · ${clean(item.latestPublished.periodo)}`:'';
+            return <article class={`process-result-card ${index===0?'process-result-card--primary':''}`} data-reveal>
+              <div class="process-result-topline">
+                <span>{process} · {view.level}</span>
+                <span>{view.period}</span>
+              </div>
+              <h3>{item.indicator}</h3>
+
+              <div class="process-result-summary">
+                <div class="process-result-number">
+                  <span class="micro">{cmsText('kpi.meta','Meta')}</span>
+                  <strong>{fmt(item.meta,item.unit)}</strong>
+                </div>
+                <div class="process-result-number process-result-number--result">
+                  <span class="micro">{cmsText('kpi.result','Resultado')}</span>
+                  {item.result!==null?<strong>{fmt(item.result,item.unit)}</strong>:<><p class="pending-result">{cmsText('kpi.pending','Pendiente de publicación')}</p>{reference&&<small class="result-reference">{cmsText('process.results.last_published','Último publicado')}: {reference}</small>}</>}
+                </div>
+
+                <div class="process-result-trend">
+                  <span class="micro">{cmsText('process.results.trend','Tendencia del indicador')}</span>
+                  {item.history.length>=2 ? <div class="trend-chart" aria-label={`Evolución histórica de ${item.indicator}`}>
+                    <svg viewBox="0 0 100 86" preserveAspectRatio="none" aria-hidden="true">
+                      <defs><linearGradient id={`trend-fill-${slugify(process)}-${slugify(view.level)}-${slugify(view.period)}-${index}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#07c8cd" stop-opacity=".28"/><stop offset="100%" stop-color="#07c8cd" stop-opacity="0"/></linearGradient></defs>
+                      <polyline class="trend-area" points={`8,78 ${trend} 92,78`} fill={`url(#trend-fill-${slugify(process)}-${slugify(view.level)}-${slugify(view.period)}-${index})`}/>
+                      <polyline class="trend-line" points={trend}/>
+                      {item.history.map((row:any,i:number)=>{
+                        const coords=trend.split(' ')[i].split(',');
+                        return <circle cx={coords[0]} cy={coords[1]} r="2.1"/>;
+                      })}
+                    </svg>
+                    <div class="trend-labels">{item.history.map((row:any)=><span><b>{fmt(Number(row.valor),item.unit)}</b><small>{row.periodo}</small></span>)}</div>
+                  </div> : <div class="trend-empty">{cmsText('process.results.no_history','El histórico aparecerá cuando se publiquen al menos dos periodos.')}</div>}
+                </div>
+              </div>
+
+              <div class="process-result-insights">
+                <div>
+                  <span>{cmsText('process.results.progress','Avance sobre la meta')}</span>
+                  <strong>{item.advance!==null?`${Math.round(item.advance)}%`:'—'}</strong>
+                </div>
+                <div>
+                  <span>{cmsText('process.results.vs_previous','Vs. periodo anterior')}</span>
+                  <strong class:list={{positive:item.delta!==null&&item.delta>=0,negative:item.delta!==null&&item.delta<0}}>{deltaFmt(item.delta,item.unit)}</strong>
+                </div>
+              </div>
+
+              {(cutoff||source)&&<div class="process-result-meta">{cutoff&&<span><Icon name="calendar" size={14}/>{cmsText('kpi.cutoff','Corte del resultado:')} {formatDate(cutoff)}</span>}{source&&<span><Icon name="document" size={14}/>{cmsText('kpi.source','Fuente:')} {source}</span>}</div>}
+            </article>;
+          })}
+        </div>:<div class="process-results-empty"><Icon name="chart" size={25}/><div><strong>{cmsText('process.results.empty_title','Resultados en preparación')}</strong><p>{cmsText('process.results.empty','La sección quedará disponible cuando se publiquen indicadores para este proceso desde Google Sheets.')}</p></div></div>}
+      </div>)}
+    </div> : <div class="process-results-empty"><Icon name="chart" size={25}/><div><strong>{cmsText('process.results.empty_title','Resultados en preparación')}</strong><p>{cmsText('process.results.empty','La sección quedará disponible cuando se publiquen indicadores para este proceso desde Google Sheets.')}</p></div></div>}
+  </div>
+</section>
+
+<script is:inline>
+(() => {
+  document.querySelectorAll('[data-process-results-root]').forEach(root => {
+    if (root.dataset.resultsReady === 'true') return;
+    root.dataset.resultsReady = 'true';
+    let periodMap = {};
+    try { periodMap = JSON.parse(root.dataset.periodMap || '{}'); } catch (_) {}
+    const periodSelect = root.querySelector('[data-result-period]');
+    const levelButtons = Array.from(root.querySelectorAll('[data-result-level]'));
+    const views = Array.from(root.querySelectorAll('[data-results-view]'));
+    let activeLevel = root.dataset.defaultLevel || levelButtons[0]?.dataset.resultLevel || 'Institucional';
+    let activePeriod = root.dataset.defaultPeriod || '';
+
+    const periodsFor = level => Array.isArray(periodMap[level]) ? periodMap[level] : [];
+    const rebuildPeriods = (level, preferred) => {
+      if (!periodSelect) return preferred || periodsFor(level).at(-1) || '';
+      const periods = periodsFor(level);
+      const next = periods.includes(preferred) ? preferred : periods.at(-1) || '';
+      periodSelect.innerHTML = '';
+      periods.forEach(period => {
+        const option = document.createElement('option');
+        option.value = period;
+        option.textContent = period;
+        option.selected = period === next;
+        periodSelect.appendChild(option);
+      });
+      return next;
+    };
+    const render = () => {
+      levelButtons.forEach(button => button.setAttribute('aria-pressed', button.dataset.resultLevel === activeLevel ? 'true' : 'false'));
+      views.forEach(view => { view.hidden = !(view.dataset.level === activeLevel && view.dataset.period === activePeriod); });
+    };
+    levelButtons.forEach(button => button.addEventListener('click', () => {
+      activeLevel = button.dataset.resultLevel || activeLevel;
+      activePeriod = rebuildPeriods(activeLevel, activePeriod);
+      render();
+    }));
+    if (periodSelect) periodSelect.addEventListener('change', () => { activePeriod = periodSelect.value; render(); });
+    activePeriod = rebuildPeriods(activeLevel, activePeriod);
+    render();
+  });
+})();
+</script>

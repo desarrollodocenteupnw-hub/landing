@@ -181,6 +181,8 @@ function dgddValidateContent(content, options) {
     period(row.periodo, p + '.periodo', true);
     text(row.indicador, p + '.indicador', true);
     text(row.unidad, p + '.unidad', true);
+    if (!blank(row.nivel) && DGDD_SCHEMA.resultLevels.indexOf(row.nivel) < 0) fail(p + '.nivel', 'nivel debe ser Institucional, Pregrado, Segundas Especialidades o Maestrías.');
+    if (!blank(row.visible) && ['si','no'].indexOf(String(row.visible).toLowerCase()) < 0) fail(p + '.visible', 'visible debe ser si o no.');
     number(row.meta, p + '.meta', false, 0, row.unidad === '%' ? 100 : undefined);
     number(row.valor, p + '.valor', false, 0, row.unidad === '%' ? 100 : undefined);
     if (!blank(row.valor)) {

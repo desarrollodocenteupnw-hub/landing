@@ -43,7 +43,7 @@ function dgddInitialSnapshot(original, meta) {
     });
   });
   content.kpis = content.kpis.map(function (row, i) {
-    return Object.assign({}, row, { id: row.id || 'KPI-' + String(i + 1).padStart(3, '0'), fecha_corte: row.fecha_corte || '', fuente: row.fuente || '', universo: row.universo || '' });
+    return Object.assign({}, row, { id: row.id || 'KPI-' + String(i + 1).padStart(3, '0'), nivel: row.nivel || 'Institucional', visible: row.visible || 'si', fecha_corte: row.fecha_corte || '', fuente: row.fuente || '', universo: row.universo || '' });
   });
   content.formacion = content.formacion.map(function (row) {
     return Object.assign({}, row, { id: row.id || 'FORM-' + row.linea + '-' + row.modulo, ruta_id: row.ruta_id || 'RUTA-' + row.linea });
@@ -113,7 +113,9 @@ function dgddEditorialToPortal(editorial, meta) {
       return out;
     }),
     kpis: tables.indicadores.map(function (row) {
-      var out = pick(row, ['id', 'indicador', 'unidad', 'periodo', 'fecha_corte', 'fuente', 'universo']);
+      var out = pick(row, ['id', 'indicador', 'unidad', 'periodo', 'nivel', 'visible', 'fecha_corte', 'fuente', 'universo']);
+      out.nivel = out.nivel || 'Institucional';
+      out.visible = out.visible || 'si';
       out.eje = axisName(row.proceso_id, true);
       out.meta = dgddNumberOrBlank(row.meta);
       out.valor = dgddNumberOrBlank(row.valor);

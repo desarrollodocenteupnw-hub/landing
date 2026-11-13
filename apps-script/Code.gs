@@ -46,8 +46,15 @@ function dgddSetup() {
       sheet.getRange(1, 1, 1, headers.length).setBackground('#00669e').setFontColor('#ffffff').setFontWeight('bold');
       sheet.setFrozenRows(1);
     }
-    // Solo se añaden validaciones a columnas reconocidas; no se reemplazan datos.
+    // Las columnas editoriales opcionales nuevas se agregan al final sin mover ni reemplazar datos existentes.
     var currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0].map(dgddText);
+    var optionalForSheet = DGDD_SCHEMA.optionalColumns && DGDD_SCHEMA.optionalColumns[name] || [];
+    optionalForSheet.forEach(function (header) {
+      if (currentHeaders.indexOf(header) >= 0) return;
+      var nextColumn = sheet.getLastColumn() + 1;
+      sheet.getRange(1, nextColumn).setValue(header).setBackground('#00669e').setFontColor('#ffffff').setFontWeight('bold');
+      currentHeaders.push(header);
+    });
     var statusColumn = currentHeaders.indexOf('estado_publicacion');
     if (statusColumn >= 0 && sheet.getMaxRows() > 1) {
       var rule = SpreadsheetApp.newDataValidation().requireValueInList(DGDD_SCHEMA.publicationStates, true).setAllowInvalid(false).build();
@@ -57,6 +64,11 @@ function dgddSetup() {
     if (visibleColumn >= 0 && sheet.getMaxRows() > 1) {
       var visibleRule = SpreadsheetApp.newDataValidation().requireValueInList(['si', 'no'], true).setAllowInvalid(false).build();
       sheet.getRange(2, visibleColumn + 1, sheet.getMaxRows() - 1, 1).setDataValidation(visibleRule);
+    }
+    var levelColumn = currentHeaders.indexOf('nivel');
+    if (levelColumn >= 0 && sheet.getMaxRows() > 1) {
+      var levelRule = SpreadsheetApp.newDataValidation().requireValueInList(DGDD_SCHEMA.resultLevels, true).setAllowInvalid(false).build();
+      sheet.getRange(2, levelColumn + 1, sheet.getMaxRows() - 1, 1).setDataValidation(levelRule);
     }
     var executionColumn = currentHeaders.indexOf('estado_ejecucion');
     if (executionColumn >= 0 && sheet.getMaxRows() > 1) {

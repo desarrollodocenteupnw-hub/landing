@@ -1,6 +1,6 @@
 {
   "meta": {
-    "schemaVersion": 2,
+    "schemaVersion": 3,
     "version": "incluido-v4-gantt-2027",
     "generatedAt": "2026-11-03T20:55:00.000Z",
     "sourceUpdatedAt": null,
@@ -3203,7 +3203,9 @@
       "universo": "",
       "eje": "Inducción",
       "meta": 90,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-002",
@@ -3215,7 +3217,9 @@
       "universo": "",
       "eje": "Inducción",
       "meta": 95,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-003",
@@ -3227,7 +3231,9 @@
       "universo": "",
       "eje": "Formación",
       "meta": 70,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-004",
@@ -3239,7 +3245,9 @@
       "universo": "",
       "eje": "Formación",
       "meta": 80,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-005",
@@ -3251,7 +3259,9 @@
       "universo": "",
       "eje": "Acompañamiento",
       "meta": 100,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-006",
@@ -3263,7 +3273,9 @@
       "universo": "",
       "eje": "Acompañamiento",
       "meta": 80,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-007",
@@ -3275,7 +3287,9 @@
       "universo": "",
       "eje": "Evaluación",
       "meta": 50,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-008",
@@ -3287,7 +3301,9 @@
       "universo": "",
       "eje": "Reconocimiento",
       "meta": 100,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     },
     {
       "id": "KPI-009",
@@ -3299,7 +3315,9 @@
       "universo": "",
       "eje": "Carrera docente",
       "meta": 10,
-      "valor": ""
+      "valor": "",
+      "nivel": "Institucional",
+      "visible": "si"
     }
   ],
   "formacion": [
@@ -15220,6 +15238,246 @@
       "color": "",
       "visible": "si",
       "orden": 0
+    },
+    {
+      "id": "process.results.kicker",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seguimiento del proceso",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 1,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.title",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Resultados para seguir avanzando.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 2,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.body",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Consulta el resultado disponible, su meta y la evolución histórica publicada para este proceso.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 3,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.period",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Periodo",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 4,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.period_aria",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seleccionar periodo de resultados",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 5,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.all",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Consulta todos los procesos",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 6,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.level",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Nivel",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 7,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.level_aria",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Seleccionar nivel de resultados",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 8,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.last_published",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Último publicado",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 9,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.trend",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Tendencia del indicador",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 10,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.no_history",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "El histórico aparecerá cuando se publiquen al menos dos periodos.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 11,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.progress",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Avance sobre la meta",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 12,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.vs_previous",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Vs. periodo anterior",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 13,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.empty_title",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "Resultados en preparación",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 14,
+      "visible": "si"
+    },
+    {
+      "id": "process.results.empty",
+      "grupo": "process.shared",
+      "pagina": "global",
+      "seccion": "resultados",
+      "tipo": "texto",
+      "titulo": "",
+      "texto": "La sección quedará disponible cuando se publiquen indicadores para este proceso desde Google Sheets.",
+      "url": "",
+      "imagen": "",
+      "imagen_alt": "",
+      "icono": "",
+      "color": "",
+      "orden": 15,
+      "visible": "si"
     }
   ],
   "equipo": [
